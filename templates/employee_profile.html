@@ -1,0 +1,174 @@
+{% extends "employee_base.html" %}
+{% load static %}
+
+{% block title %}My Profile | Attendance Management System{% endblock %}
+{% block page_heading %}My Profile{% endblock %}
+{% block page_subheading %}Manage your personal information, profile photo, contact details, and account security{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <div class="row g-4">
+    
+    <!-- LEFT COLUMN: Profile Overview Card -->
+    <div class="col-lg-4 col-xl-4">
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 text-center">
+        
+        <div class="position-relative d-inline-block mx-auto mb-3">
+          {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="Profile Avatar" class="rounded-circle border border-4 border-light shadow" style="width: 120px; height: 120px; object-fit: cover;">
+          {% else %}
+            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm mx-auto" style="width: 120px; height: 120px; font-size: 42px;">
+              {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+        </div>
+
+        <h4 class="fw-bold text-dark mb-1">{{ user.first_name }} {{ user.last_name }}</h4>
+        <div class="badge bg-light text-primary fw-semibold px-3 py-1 mb-2 border">
+          ID: {{ profile.employee_id|default:"EMP-NEW" }}
+        </div>
+        <p class="text-muted small mb-3">
+          {{ profile.designation|default:"Employee" }} &bull; {{ profile.department.name|default:"General Department" }}
+        </p>
+
+        <hr class="my-3">
+
+        <div class="text-start small">
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Username:</span>
+            <strong class="text-dark">{{ user.username }}</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Email Address:</span>
+            <strong class="text-dark">{{ user.email|default:"Not specified" }}</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Phone Number:</span>
+            <strong class="text-dark">{{ profile.phone|default:"Not specified" }}</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Joining Date:</span>
+            <strong class="text-dark">{{ user.date_joined|date:"d M Y" }}</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2">
+            <span class="text-muted">Biometric Status:</span>
+            <span>
+              {% if face_profile.is_enrolled %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                  <i class="bi bi-shield-check me-1"></i> Registered
+                </span>
+              {% elif profile.face_auth_exempt %}
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                  <i class="bi bi-shield me-1"></i> Exempted
+                </span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                  <i class="bi bi-exclamation-triangle me-1"></i> Not Registered
+                </span>
+              {% endif %}
+            </span>
+          </div>
+        </div>
+
+        {% if not face_profile.is_enrolled and not profile.face_auth_exempt %}
+          <div class="mt-4">
+            <a href="{% url 'employee_scanner' %}" class="btn btn-warning w-100 rounded-pill fw-bold text-dark py-2 shadow-sm">
+              <i class="bi bi-camera me-1"></i> Register Face Biometrics
+            </a>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Update Profile & Change Password Tabs -->
+    <div class="col-lg-8 col-xl-8">
+      
+      <!-- Card 1: Update Profile Details -->
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-4">
+        <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+          <i class="bi bi-person-gear text-primary"></i> Edit Profile Information
+        </h5>
+
+        <form method="POST" action="{% url 'employee_profile' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="update_profile">
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">First Name</label>
+              <input type="text" class="form-control" value="{{ user.first_name }}" disabled>
+              <small class="text-muted">Contact admin to modify full name.</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Last Name</label>
+              <input type="text" class="form-control" value="{{ user.last_name }}" disabled>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Email Address</label>
+              <input type="email" class="form-control" value="{{ user.email }}" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Phone Number</label>
+              <input type="text" name="phone" class="form-control" value="{{ profile.phone|default:'' }}" placeholder="+91 9876543210">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold text-dark">Update Profile Photo</label>
+            <input type="file" name="profile_picture" class="form-control" accept="image/*">
+            <small class="text-muted">Recommended: Square format, JPG/PNG under 2MB.</small>
+          </div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+              <i class="bi bi-check2-circle me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Card 2: Security & Password Update -->
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+        <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+          <i class="bi bi-shield-lock text-primary"></i> Change Account Password
+        </h5>
+
+        <form method="POST" action="{% url 'employee_profile' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="update_password">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold text-dark">Current Password <span class="text-danger">*</span></label>
+            <input type="password" name="old_password" class="form-control" placeholder="Enter current password" required>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">New Password <span class="text-danger">*</span></label>
+              <input type="password" name="new_password" class="form-control" placeholder="Min. 6 characters" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-dark">Confirm New Password <span class="text-danger">*</span></label>
+              <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter new password" required>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-outline-danger rounded-pill px-4 fw-semibold">
+              <i class="bi bi-key me-1"></i> Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

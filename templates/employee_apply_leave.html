@@ -1,0 +1,170 @@
+{% extends "employee_base.html" %}
+{% load static %}
+
+{% block title %}Apply for Leave | Attendance Management System{% endblock %}
+{% block page_heading %}Apply for Leave{% endblock %}
+{% block page_subheading %}Submit a formal leave application for manager & administrator approval{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <div class="row g-4 justify-content-center">
+    
+    <!-- Application Form Card -->
+    <div class="col-lg-8 col-xl-7">
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+        
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+          <div class="rounded-circle bg-primary-subtle text-primary p-3 fs-4">
+            <i class="bi bi-calendar-plus"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0 text-dark">Leave Application Form</h4>
+            <small class="text-muted">Applications will be reviewed by company HR & Administrators</small>
+          </div>
+        </div>
+
+        <form method="POST" action="{% url 'employee_apply_leave' %}" enctype="multipart/form-data" id="leaveApplicationForm">
+          {% csrf_token %}
+
+          <!-- Leave Type -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-dark">Leave Type <span class="text-danger">*</span></label>
+            <select name="leave_type" class="form-select form-select-lg rounded-3" required id="leaveTypeSelect">
+              <option value="" disabled selected>-- Select Leave Category --</option>
+              <option value="Casual Leave">Casual Leave (CL)</option>
+              <option value="Sick Leave">Sick Leave (SL)</option>
+              <option value="Paid Leave">Paid / Annual Leave (PL)</option>
+              <option value="Unpaid Leave">Unpaid Leave / Loss of Pay (LOP)</option>
+              <option value="Other">Other / Emergency Leave</option>
+            </select>
+          </div>
+
+          <!-- Date Range (From & To) -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">Start Date <span class="text-danger">*</span></label>
+              <input type="date" name="from_date" id="fromDateInput" class="form-control form-control-lg rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">End Date <span class="text-danger">*</span></label>
+              <input type="date" name="to_date" id="toDateInput" class="form-control form-control-lg rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
+            </div>
+          </div>
+
+          <!-- Calculated Total Days Banner -->
+          <div class="alert alert-info py-2 px-3 rounded-3 d-flex align-items-center justify-content-between mb-4">
+            <span class="small fw-semibold"><i class="bi bi-clock-history me-1"></i> Requested Duration:</span>
+            <span class="fw-bold fs-6" id="totalDaysDisplay">1 Day(s)</span>
+          </div>
+
+          <!-- Reason -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-dark">Reason for Leave <span class="text-danger">*</span></label>
+            <textarea name="reason" class="form-control rounded-3" rows="4" placeholder="Please explain the reason for your leave request in detail..." required></textarea>
+          </div>
+
+          <!-- Supporting Document (Optional) -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-dark">Supporting Document <span class="text-muted fw-normal">(Optional, e.g. Medical Certificate)</span></label>
+            <input type="file" name="supporting_document" class="form-control rounded-3" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+            <small class="text-muted d-block mt-1">Accepted formats: PDF, JPG, PNG, DOCX (Max size: 5MB)</small>
+          </div>
+
+          <hr class="my-4">
+
+          <!-- Submit Buttons -->
+          <div class="d-flex align-items-center justify-content-between">
+            <a href="{% url 'employee_leave_requests' %}" class="btn btn-outline-secondary rounded-pill px-4">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+              <i class="bi bi-send me-1"></i> Submit Application
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Side Guidance Card -->
+    <div class="col-lg-4 col-xl-4">
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+        <h5 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+          <i class="bi bi-info-circle text-primary"></i> Leave Policy Guidelines
+        </h5>
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item px-0 py-2">
+            <strong class="d-block text-dark">Pending Status</strong>
+            All submitted applications enter <em>Pending</em> status until evaluated by an administrator.
+          </li>
+          <li class="list-group-item px-0 py-2">
+            <strong class="d-block text-dark">Sick Leave Documentation</strong>
+            Medical certificates are encouraged for sick leaves exceeding 2 consecutive days.
+          </li>
+          <li class="list-group-item px-0 py-2">
+            <strong class="d-block text-dark">Overlapping Requests</strong>
+            You cannot apply for leaves covering dates with existing pending or approved requests.
+          </li>
+          <li class="list-group-item px-0 py-2">
+            <strong class="d-block text-dark">Cancellation</strong>
+            You can cancel any <em>Pending</em> leave request directly from the <a href="{% url 'employee_leave_requests' %}">My Leave Requests</a> page.
+          </li>
+        </ul>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-center" style="background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%);">
+        <div class="rounded-circle bg-white text-primary p-3 d-inline-flex mx-auto mb-2 shadow-sm">
+          <i class="bi bi-journal-check fs-4"></i>
+        </div>
+        <h6 class="fw-bold text-dark mb-1">Track Existing Requests</h6>
+        <p class="small text-secondary mb-3">View the status of your past and pending applications.</p>
+        <a href="{% url 'employee_leave_requests' %}" class="btn btn-primary rounded-pill btn-sm px-4 fw-semibold">
+          View My Requests
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Calculate total days between start and end date
+  const fromInput = document.getElementById('fromDateInput');
+  const toInput = document.getElementById('toDateInput');
+  const daysDisplay = document.getElementById('totalDaysDisplay');
+
+  function calculateDays() {
+    if (!fromInput.value || !toInput.value) return;
+
+    const fromDate = new Date(fromInput.value);
+    const toDate = new Date(toInput.value);
+
+    if (toDate < fromDate) {
+      daysDisplay.textContent = 'Invalid (End before Start)';
+      daysDisplay.className = 'fw-bold fs-6 text-danger';
+      return;
+    }
+
+    const diffTime = toDate - fromDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    daysDisplay.textContent = `${diffDays} Day(s)`;
+    daysDisplay.className = 'fw-bold fs-6 text-primary';
+  }
+
+  fromInput.addEventListener('change', () => {
+    if (toInput.value < fromInput.value) {
+      toInput.value = fromInput.value;
+    }
+    calculateDays();
+  });
+
+  toInput.addEventListener('change', calculateDays);
+  calculateDays();
+</script>
+{% endblock %}

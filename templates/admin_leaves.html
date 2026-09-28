@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Applications | Admin Portal{% endblock %}
+{% block page_heading %}Leave Applications Management{% endblock %}
+{% block page_subheading %}Review, approve, and track employee leave requests{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- Status Filter Pills -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="{% url 'admin_leaves' %}" class="btn btn-sm rounded-pill px-3 fw-semibold {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+          All Leaves
+        </a>
+        <a href="{% url 'admin_leaves' %}?status=Pending" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Pending' %}btn-warning text-dark{% else %}btn-outline-warning text-dark{% endif %}">
+          <i class="bi bi-hourglass-split me-1"></i> Pending Requests
+        </a>
+        <a href="{% url 'admin_leaves' %}?status=Approved" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Approved' %}btn-success{% else %}btn-outline-success{% endif %}">
+          <i class="bi bi-check-circle me-1"></i> Approved
+        </a>
+        <a href="{% url 'admin_leaves' %}?status=Rejected" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+          <i class="bi bi-x-circle me-1"></i> Rejected
+        </a>
+      </div>
+      <span class="text-muted small">Total Requests: <strong>{{ leaves|length }}</strong></span>
+    </div>
+  </div>
+
+  <!-- Leave Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3" style="min-width: 180px;">Employee</th>
+            <th>Leave Type</th>
+            <th>Duration</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Document</th>
+            <th>Status</th>
+            <th>Reviewed By</th>
+            <th class="text-end pe-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lv in leaves %}
+            <tr>
+              <!-- Employee Name & EMP ID -->
+              <td class="ps-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 13px; flex-shrink: 0;">
+                    {{ lv.user.first_name|default:lv.user.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <strong class="d-block text-dark">{{ lv.user.first_name }} {{ lv.user.last_name|default:"" }}</strong>
+                    <div class="d-flex align-items-center gap-1 mt-1">
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0" style="font-size: 11px;">
+                        ID: {{ lv.user.profile.employee_id|default:"EMP-ID" }}
+                      </span>
+                      <small class="text-muted" style="font-size: 11px;">@{{ lv.user.username }}</small>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Leave Type -->
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill fw-semibold">
+                  {{ lv.leave_type }}
+                </span>
+              </td>
+
+              <!-- Duration -->
+              <td class="small">
+                <span class="fw-semibold text-dark d-block">{{ lv.from_date|date:"M d, Y" }}</span>
+                <span class="text-muted">to {{ lv.to_date|date:"M d, Y" }}</span>
+              </td>
+
+              <!-- Days -->
+              <td>
+                <span class="badge bg-light text-dark border fw-bold px-2 py-1">
+                  {{ lv.total_days }} day(s)
+                </span>
+              </td>
+
+              <!-- Reason -->
+              <td class="small text-secondary" style="max-width: 220px;">
+                <div class="text-truncate" style="max-width: 210px;" title="{{ lv.reason }}">
+                  {{ lv.reason }}
+                </div>
+              </td>
+
+              <!-- Document -->
+              <td class="small">
+                {% if lv.supporting_document %}
+                  <a href="{{ lv.supporting_document.url }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2" style="font-size: 11px;">
+                    <i class="bi bi-paperclip"></i> View
+                  </a>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+
+              <!-- Status -->
+              <td>
+                {% if lv.status == "Approved" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-check-circle-fill me-1"></i> Approved
+                  </span>
+                {% elif lv.status == "Rejected" %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-x-circle-fill me-1"></i> Rejected
+                  </span>
+                {% elif lv.status == "Cancelled" %}
+                  <span class="badge bg-secondary-subtle text-secondary px-3 py-1 rounded-pill">
+                    <i class="bi bi-slash-circle me-1"></i> Cancelled
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-hourglass-split me-1"></i> Pending
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Reviewed By -->
+              <td class="small">
+                {% if lv.reviewed_by %}
+                  <div class="fw-semibold text-dark">{{ lv.reviewed_by.username }} ({{ lv.reviewed_at|date:"M d" }})</div>
+                  {% if lv.admin_remark %}
+                    <small class="text-muted d-block text-truncate" style="max-width: 160px;" title="{{ lv.admin_remark }}">
+                      <i class="bi bi-chat-left-text me-1 text-primary"></i>{{ lv.admin_remark }}
+                    </small>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+
+              <!-- Action -->
+              <td class="text-end pe-3">
+                {% if lv.status == "Pending" %}
+                  <button type="button" class="btn btn-success btn-sm rounded-pill px-3 py-1 review-leave-btn shadow-sm"
+                          data-action-url="{% url 'admin_leave_action' lv.id %}"
+                          data-emp-name="{{ lv.user.first_name }} {{ lv.user.last_name|default:'' }}"
+                          data-emp-id="{{ lv.user.profile.employee_id|default:'EMP-ID' }}"
+                          data-dates="{{ lv.from_date|date:'M d, Y' }} to {{ lv.to_date|date:'M d, Y' }}"
+                          data-days="{{ lv.total_days }}"
+                          data-reason="{{ lv.reason }}">
+                    <i class="bi bi-check2-circle me-1"></i> Review
+                  </button>
+                {% else %}
+                  <span class="badge bg-light text-muted border px-2 py-1">Closed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center py-5 text-muted">
+                <i class="bi bi-journal-check fs-2 d-block mb-2 text-secondary"></i>
+                No leave requests found for this filter.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     STANDALONE MODAL (Placed outside the table to prevent glitches)
+========================================================= -->
+<div class="modal fade" id="reviewLeaveModal" tabindex="-1" aria-labelledby="reviewLeaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+      <form id="reviewLeaveForm" method="POST" action="">
+        {% csrf_token %}
+        <div class="modal-header bg-dark text-white border-0 py-3">
+          <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="reviewLeaveModalLabel">
+            <i class="bi bi-shield-check text-success"></i> Review Leave Request
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-start">
+          <div class="p-3 bg-light rounded-3 border mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <strong class="text-dark fs-6" id="modalEmpName">Employee Name</strong>
+              <span class="badge bg-primary text-white" id="modalEmpId">ID: EMP-0000</span>
+            </div>
+            <div class="small text-muted mb-1">
+              <i class="bi bi-calendar3 me-1"></i> <strong>Dates:</strong> <span id="modalDates"></span> (<span id="modalDays" class="fw-bold text-dark"></span> days)
+            </div>
+            <div class="small text-secondary">
+              <i class="bi bi-chat-quote me-1"></i> <strong>Reason:</strong> <span id="modalReason"></span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark">Decision <span class="text-danger">*</span></label>
+            <select name="action" class="form-select form-select-lg rounded-3" required>
+              <option value="Approved">✅ Approve Leave</option>
+              <option value="Rejected">❌ Reject Leave</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-dark">Admin Remark</label>
+            <input type="text" name="admin_remark" class="form-control rounded-3" placeholder="Optional remark or feedback for employee...">
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-3 bg-light">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+            <i class="bi bi-check-lg me-1"></i> Submit Decision
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Clean standalone modal trigger without table glitching
+  const reviewModalEl = document.getElementById('reviewLeaveModal');
+  const reviewModal = new bootstrap.Modal(reviewModalEl);
+  const reviewForm = document.getElementById('reviewLeaveForm');
+  const modalEmpName = document.getElementById('modalEmpName');
+  const modalEmpId = document.getElementById('modalEmpId');
+  const modalDates = document.getElementById('modalDates');
+  const modalDays = document.getElementById('modalDays');
+  const modalReason = document.getElementById('modalReason');
+
+  document.querySelectorAll('.review-leave-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      reviewForm.action = btn.getAttribute('data-action-url');
+      modalEmpName.textContent = btn.getAttribute('data-emp-name') || 'Employee';
+      modalEmpId.textContent = 'ID: ' + (btn.getAttribute('data-emp-id') || 'N/A');
+      modalDates.textContent = btn.getAttribute('data-dates');
+      modalDays.textContent = btn.getAttribute('data-days');
+      modalReason.textContent = btn.getAttribute('data-reason');
+      reviewModal.show();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Management | Admin Portal{% endblock %}
+{% block page_heading %}Employee & Biometrics Management{% endblock %}
+{% block page_subheading %}Manage employee accounts, biometric face enrollment, and departmental roles{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- =========================================================
+       1. CONTROLS & ADD EMPLOYEE BUTTON
+  ========================================================= -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <!-- Search -->
+      <form method="GET" class="d-flex align-items-center gap-2">
+        <div class="input-group input-group-sm" style="width: 280px;">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="Search employee or ID..." value="{{ search_q }}">
+        </div>
+
+        <select name="department" class="form-select form-select-sm" style="width: 170px;">
+          <option value="">All Departments</option>
+          {% for d in departments %}
+            <option value="{{ d.id }}" {% if dept_id == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
+          {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold">Filter</button>
+        {% if search_q or dept_id %}
+          <a href="{% url 'admin_employees' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        {% endif %}
+      </form>
+
+      <!-- Add New Employee Button -->
+      <div>
+        <button type="button" class="btn btn-success btn-sm fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+          <i class="bi bi-person-plus-fill me-1"></i> Add New Employee
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. EMPLOYEES TABLE
+  ========================================================= -->
+  <div class="attendance-table-card mb-4">
+    <div class="table-responsive">
+      <table class="table table-attendance">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Emp ID</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Biometrics Status</th>
+            <th>Account Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in employees %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
+                    {{ emp.first_name|default:emp.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ emp.first_name }} {{ emp.last_name }} ({{ emp.username }})</div>
+                    <small class="text-muted">{{ emp.email|default:"No email" }}</small>
+                  </div>
+                </div>
+              </td>
+              <td><strong>{{ emp.profile.employee_id|default:"N/A" }}</strong></td>
+              <td>{{ emp.profile.department.name|default:"General" }}</td>
+              <td>{{ emp.profile.designation|default:"Employee" }}</td>
+              <td>
+                {% if emp.face_profile.is_enrolled %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-shield-check me-1"></i> Enrolled
+                  </span>
+                  <small class="d-block text-muted" style="font-size: 10px;">{{ emp.face_profile.enrolled_at|date:"M d, Y" }}</small>
+                {% elif emp.profile.face_auth_exempt %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    <i class="bi bi-person-check me-1"></i> Exempted
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                    <i class="bi bi-shield-x me-1"></i> Not Enrolled
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if emp.is_active %}
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ emp.date_joined|date:"M d, Y" }}</td>
+              <td>
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary btn-sm dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                    <li>
+                      <a class="dropdown-item" href="{% url 'attendance_report' %}?employee_id={{ emp.id }}">
+                        <i class="bi bi-calendar2-week me-2 text-primary"></i> View Attendance History
+                      </a>
+                    </li>
+                    <li>
+                      <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#enrollModal{{ emp.id }}">
+                        <i class="bi bi-camera-fill me-2 text-success"></i> Enroll Face Biometrics
+                      </button>
+                    </li>
+                    {% if emp.face_profile.is_enrolled %}
+                      <li>
+                        <form action="{% url 'api_reset_face' %}" method="POST" onsubmit="return confirm('Reset biometric data for {{ emp.username }}?');">
+                          {% csrf_token %}
+                          <input type="hidden" name="user_id" value="{{ emp.id }}">
+                          <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i> Reset Face Profile
+                          </button>
+                        </form>
+                      </li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                      <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editModal{{ emp.id }}">
+                        <i class="bi bi-pencil-fill me-2 text-dark"></i> Edit Details
+                      </button>
+                    </li>
+                    <li>
+                      <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#resetPassModal{{ emp.id }}">
+                        <i class="bi bi-key-fill me-2 text-warning"></i> Reset Password
+                      </button>
+                    </li>
+                    <li>
+                      <form action="{% url 'admin_employee_toggle_status' emp.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item {% if emp.is_active %}text-danger{% else %}text-success{% endif %}">
+                          <i class="bi bi-power me-2"></i> {% if emp.is_active %}Deactivate Account{% else %}Activate Account{% endif %}
+                        </button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Live Face Enrollment Modal for this employee -->
+                <div class="modal fade" id="enrollModal{{ emp.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                      <div class="modal-header bg-dark text-white border-0 py-3">
+                        <h5 class="modal-title fw-bold">
+                          <i class="bi bi-camera-video-fill text-primary me-2"></i> Enroll Face for {{ emp.username }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body p-4 text-center bg-light">
+                        <div class="camera-wrapper position-relative mx-auto">
+                          <video id="video{{ emp.id }}" autoplay playsinline muted></video>
+                          <canvas id="canvas{{ emp.id }}"></canvas>
+                          <div class="scanner-overlay">
+                            <div class="scanner-frame"></div>
+                          </div>
+                        </div>
+
+                        <div class="scanner-status-box mt-3">
+                          <span class="scanner-badge badge-info" id="status{{ emp.id }}">
+                            Position {{ emp.username }}'s face inside the oval
+                          </span>
+                        </div>
+                      </div>
+                      <div class="modal-footer border-0 p-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <script>
+                  document.getElementById('enrollModal{{ emp.id }}').addEventListener('show.bs.modal', function() {
+                    const scanner = new FaceScanner({
+                      videoId: 'video{{ emp.id }}',
+                      canvasId: 'canvas{{ emp.id }}',
+                      statusTextId: 'status{{ emp.id }}',
+                      onVerified: async (descriptorArray, livenessScore) => {
+                        const formData = new URLSearchParams();
+                        formData.append('user_id', '{{ emp.id }}');
+                        formData.append('face_descriptor', JSON.stringify(descriptorArray));
+                        formData.append('liveness_score', livenessScore);
+
+                        const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                        const resp = await fetch("{% url 'api_enroll_face' %}", {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrf
+                          },
+                          body: formData.toString()
+                        });
+
+                        const res = await resp.json();
+                        alert(res.message);
+                        if (res.status === 'success') {
+                          window.location.reload();
+                        }
+                      }
+                    });
+                    scanner.startScanning();
+
+                    document.getElementById('enrollModal{{ emp.id }}').addEventListener('hide.bs.modal', function() {
+                      scanner.stopCamera();
+                    }, { once: true });
+                  });
+                </script>
+
+                <!-- Edit Employee Modal -->
+                <div class="modal fade" id="editModal{{ emp.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 rounded-4 shadow-lg">
+                      <form action="{% url 'admin_employee_edit' emp.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header bg-dark text-white border-0 py-3">
+                          <h5 class="modal-title fw-bold">Edit Details: {{ emp.username }}</h5>
+                          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-start">
+                          <div class="row g-2 mb-3">
+                            <div class="col-6">
+                              <label class="form-label fw-semibold">First Name</label>
+                              <input type="text" name="first_name" class="form-control" value="{{ emp.first_name }}">
+                            </div>
+                            <div class="col-6">
+                              <label class="form-label fw-semibold">Last Name</label>
+                              <input type="text" name="last_name" class="form-control" value="{{ emp.last_name }}">
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ emp.email }}">
+                          </div>
+                          <div class="row g-2 mb-3">
+                            <div class="col-6">
+                              <label class="form-label fw-semibold">Department</label>
+                              <select name="department" class="form-select">
+                                <option value="">Select Department</option>
+                                {% for d in departments %}
+                                  <option value="{{ d.id }}" {% if emp.profile.department_id == d.id %}selected{% endif %}>{{ d.name }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-6">
+                              <label class="form-label fw-semibold">Designation</label>
+                              <input type="text" name="designation" class="form-control" value="{{ emp.profile.designation }}">
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-semibold">Contact Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ emp.profile.phone }}">
+                          </div>
+                          <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="face_auth_exempt" id="exempt{{ emp.id }}" {% if emp.profile.face_auth_exempt %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="exempt{{ emp.id }}">Exempt from Face Scanner</label>
+                          </div>
+                          <div class="mb-2">
+                            <input type="text" name="exemption_reason" class="form-control form-control-sm" placeholder="Reason for exemption (if applicable)" value="{{ emp.profile.exemption_reason }}">
+                          </div>
+                        </div>
+                        <div class="modal-footer border-0 p-3">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reset Password Modal -->
+                <div class="modal fade" id="resetPassModal{{ emp.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 rounded-4 shadow-lg">
+                      <form action="{% url 'admin_employee_reset_password' emp.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header bg-warning-subtle text-warning-emphasis border-0 py-3">
+                          <h5 class="modal-title fw-bold">Reset Password for {{ emp.username }}</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-start">
+                          <label class="form-label fw-semibold">New Password</label>
+                          <input type="password" name="new_password" class="form-control" required minlength="6" placeholder="Enter new secure password">
+                        </div>
+                        <div class="modal-footer border-0 p-3">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-warning fw-bold">Reset Password</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">No employees found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     ADD NEW EMPLOYEE MODAL
+========================================================= -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <form action="{% url 'admin_employee_add' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white border-0 py-3">
+          <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill me-2"></i> Register New Employee</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Username *</label>
+              <input type="text" name="username" class="form-control" required placeholder="e.g. jdoe">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Password *</label>
+              <input type="password" name="password" class="form-control" required minlength="6" placeholder="Initial password">
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">First Name</label>
+              <input type="text" name="first_name" class="form-control" placeholder="John">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Last Name</label>
+              <input type="text" name="last_name" class="form-control" placeholder="Doe">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="jdoe@example.com">
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Department</label>
+              <select name="department" class="form-select">
+                <option value="">Select Department</option>
+                {% for d in departments %}
+                  <option value="{{ d.id }}">{{ d.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Designation</label>
+              <input type="text" name="designation" class="form-control" placeholder="e.g. Software Engineer">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Phone</label>
+            <input type="text" name="phone" class="form-control" placeholder="+91 ...">
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" name="face_auth_exempt" id="newExempt">
+            <label class="form-check-label fw-semibold" for="newExempt">Exempt from Face Scanner</label>
+          </div>
+          <div class="mb-2">
+            <input type="text" name="exemption_reason" class="form-control form-control-sm" placeholder="Reason for exemption (if applicable)">
+          </div>
+        </div>
+        <div class="modal-footer border-0 p-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success fw-bold px-4">Create Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

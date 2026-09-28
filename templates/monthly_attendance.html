@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Attendance Report ({{ month_name }} {{ year }}){% endblock %}
+{% block page_heading %}Monthly Attendance Matrix{% endblock %}
+{% block page_subheading %}
+  Record for <strong>{{ target_user.first_name|default:target_user.username }}</strong> (ID: {{ target_user.profile.employee_id|default:"N/A" }}) – {{ month_name }} {{ year }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- =========================================================
+       1. FILTER BAR & ACTIONS
+  ========================================================= -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <!-- Filter Form -->
+      <form method="GET" class="d-flex flex-wrap align-items-center gap-2">
+        {% if not is_self %}
+          <input type="hidden" name="employee_id" value="{{ target_user.id }}">
+        {% endif %}
+        <div class="input-group input-group-sm" style="width: 170px;">
+          <span class="input-group-text"><i class="bi bi-calendar-month"></i></span>
+          <select name="month" class="form-select">
+            {% for m_num, m_name in month_names %}
+              <option value="{{ m_num }}" {% if m_num == month %}selected{% endif %}>{{ m_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="input-group input-group-sm" style="width: 140px;">
+          <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+          <select name="year" class="form-select">
+            {% for y in years_list %}
+              <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold">
+          <i class="bi bi-funnel me-1"></i> Apply Filter
+        </button>
+      </form>
+
+      <!-- Print and Export -->
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+          <i class="bi bi-printer me-1"></i> Print Report
+        </button>
+        {% if request.user.is_staff or request.user.is_superuser %}
+          <a href="{% url 'export_attendance_excel' %}?month={{ month }}&year={{ year }}&employee={{ target_user.id }}" class="btn btn-success btn-sm fw-bold">
+            <i class="bi bi-file-earmark-excel me-1"></i> Download Excel
+          </a>
+          <a href="{% url 'export_attendance_csv' %}?month={{ month }}&year={{ year }}&employee={{ target_user.id }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-filetype-csv me-1"></i> CSV
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. MONTHLY METRIC TILES
+  ========================================================= -->
+  <div class="row g-2 mb-4 text-center">
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3">
+        <div class="stat-value text-primary fs-3">{{ summary.scheduled_working_days }}</div>
+        <div class="stat-label small">Working Days</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--present-green);">
+        <div class="stat-value text-success fs-3">{{ summary.present_count }}</div>
+        <div class="stat-label small">On Time Present</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--late-red);">
+        <div class="stat-value text-danger fs-3">{{ summary.late_count }}</div>
+        <div class="stat-label small">Late Days</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--absent-yellow);">
+        <div class="stat-value text-warning fs-3">{{ summary.absent_count }}</div>
+        <div class="stat-label small">Absent Days</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--pending-teal);">
+        <div class="stat-value text-teal fs-3" style="color: var(--pending-teal);">{{ summary.pending_count }}</div>
+        <div class="stat-label small">Pending Punch Out</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--holiday-blue);">
+        <div class="stat-value text-primary fs-3">{{ summary.holiday_count }}</div>
+        <div class="stat-label small">Sundays / Holidays</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg">
+      <div class="stat-card p-3" style="border-left: 4px solid var(--leave-purple);">
+        <div class="stat-value text-purple fs-3" style="color: var(--leave-purple);">{{ summary.leave_count }}</div>
+        <div class="stat-label small">Leaves Taken</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg">
+      <div class="stat-card p-3 bg-light">
+        <div class="stat-value text-dark fs-3">{{ summary.attendance_percentage }}%</div>
+        <div class="stat-label small">Attendance Rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       3. VISUAL STATUS LEGEND
+  ========================================================= -->
+  <div class="attendance-legend mb-3">
+    <span class="fw-bold me-2"><i class="bi bi-palette me-1"></i> Row Status Legend:</span>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--present-bg);"></span>
+      <span><strong>Green:</strong> Present / On Time (9:30–9:35 AM)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--late-bg);"></span>
+      <span><strong>Red:</strong> Late (> 9:35 AM)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--pending-bg);"></span>
+      <span><strong>Teal:</strong> Punch Out Pending</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--absent-bg);"></span>
+      <span><strong>Yellow:</strong> Absent (Closed scheduled day without punch)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--holiday-bg);"></span>
+      <span><strong>Blue:</strong> Holiday / Sunday</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--leave-bg);"></span>
+      <span><strong>Purple:</strong> Approved Leave</span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       4. DAY-BY-DAY ATTENDANCE MATRIX TABLE
+  ========================================================= -->
+  <div class="attendance-table-card">
+    <div class="table-responsive">
+      <table class="table table-attendance">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Working Hours</th>
+            <th>Delay / On-Time</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in days %}
+            <tr class="{{ row.row_class }}">
+              <td class="fw-bold">{{ row.date|date:"Y-m-d" }}</td>
+              <td>{{ row.day }}</td>
+              <td>
+                {% if row.punch_in %}
+                  <strong>{{ row.punch_in|time:"h:i:s A" }}</strong>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if row.punch_out %}
+                  <strong>{{ row.punch_out|time:"h:i:s A" }}</strong>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="fw-semibold">{{ row.working_hours }}</span>
+              </td>
+              <td>
+                {% if "Late" in row.status %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ row.delay }}</span>
+                {% elif "Present" in row.status %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">On Time</span>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if row.location and row.location != "-" %}
+                  <div class="text-truncate" style="max-width: 170px;" title="{{ row.location }}">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ row.location }}
+                  </div>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="status-badge {{ row.badge_class }}">
+                  {{ row.status }}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">{{ row.notes }}</small>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

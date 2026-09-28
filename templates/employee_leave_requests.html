@@ -1,0 +1,151 @@
+{% extends "employee_base.html" %}
+{% load static %}
+
+{% block title %}My Leave Requests | Attendance Management System{% endblock %}
+{% block page_heading %}My Leave Applications{% endblock %}
+{% block page_subheading %}Track the approval status and administrative feedback for your submitted leaves{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- Header Banner & Action Button -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <h5 class="fw-bold mb-1 text-dark">Leave Application History</h5>
+        <p class="text-muted small mb-0">Total Applications: <strong>{{ leaves|length }}</strong></p>
+      </div>
+      <div>
+        <a href="{% url 'employee_apply_leave' %}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
+          <i class="bi bi-calendar-plus"></i> Apply for New Leave
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave Applications Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Leave Type</th>
+            <th>Duration</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Applied On</th>
+            <th>Document</th>
+            <th>Status</th>
+            <th>Admin Remarks</th>
+            <th class="text-end pe-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for leave in leaves %}
+            <tr>
+              <!-- Leave Type -->
+              <td class="ps-3 fw-bold text-dark">
+                {{ leave.leave_type }}
+              </td>
+
+              <!-- Dates -->
+              <td class="small">
+                <span class="d-block fw-semibold text-dark">{{ leave.from_date|date:"d M Y" }}</span>
+                <span class="text-muted">to {{ leave.to_date|date:"d M Y" }}</span>
+              </td>
+
+              <!-- Days -->
+              <td>
+                <span class="badge bg-light text-dark border fw-bold px-2 py-1">
+                  {{ leave.total_days }} Day(s)
+                </span>
+              </td>
+
+              <!-- Reason -->
+              <td class="small text-secondary" style="max-width: 200px;">
+                <span class="d-inline-block text-truncate" style="max-width: 190px;" title="{{ leave.reason }}">
+                  {{ leave.reason }}
+                </span>
+              </td>
+
+              <!-- Applied Date -->
+              <td class="small text-muted">
+                {{ leave.created_at|date:"d M Y, h:i A" }}
+              </td>
+
+              <!-- Document -->
+              <td class="small">
+                {% if leave.supporting_document %}
+                  <a href="{{ leave.supporting_document.url }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill py-0 px-2" style="font-size: 11px;">
+                    <i class="bi bi-paperclip"></i> View
+                  </a>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+
+              <!-- Status Badge -->
+              <td>
+                {% if leave.status == "Pending" %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-hourglass-split me-1"></i> Pending
+                  </span>
+                {% elif leave.status == "Approved" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-check-circle-fill me-1"></i> Approved
+                  </span>
+                {% elif leave.status == "Rejected" %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-x-circle-fill me-1"></i> Rejected
+                  </span>
+                {% elif leave.status == "Cancelled" %}
+                  <span class="badge bg-secondary-subtle text-secondary px-3 py-1 rounded-pill">
+                    <i class="bi bi-slash-circle me-1"></i> Cancelled
+                  </span>
+                {% else %}
+                  <span class="badge bg-light text-dark border px-3 py-1 rounded-pill">
+                    {{ leave.status }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Admin Remarks -->
+              <td class="small" style="max-width: 180px;">
+                {% if leave.admin_remark %}
+                  <span class="d-inline-block text-truncate text-secondary" style="max-width: 170px;" title="{{ leave.admin_remark }}">
+                    <i class="bi bi-chat-left-text me-1 text-primary"></i>{{ leave.admin_remark }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+
+              <!-- Actions (Cancel if Pending) -->
+              <td class="text-end pe-3">
+                {% if leave.status == "Pending" and not leave.is_cancelled %}
+                  <form method="POST" action="{% url 'employee_cancel_leave' leave.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this pending leave request?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1" style="font-size: 12px;">
+                      <i class="bi bi-x-lg me-1"></i> Cancel
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center py-5 text-muted">
+                <i class="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
+                No leave requests found. Click <strong>"Apply for New Leave"</strong> above to submit an application.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

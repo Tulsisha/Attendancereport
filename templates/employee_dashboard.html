@@ -1,0 +1,365 @@
+{% extends "employee_base.html" %}
+{% load static %}
+
+{% block title %}Employee Dashboard | HRMS{% endblock %}
+{% block page_heading %}Welcome, {{ user.first_name|default:user.username }}!{% endblock %}
+{% block page_subheading %}Employee Self-Service Portal &bull; Shift: {{ office_start_time }} – {{ office_closing_time }} ({{ shift_duration }}){% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- ROW 1: Employee Identity Card & Today's Attendance Real-Time Card -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Employee Identity Card -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4" style="background: linear-gradient(135deg, #072147 0%, #1e3a8a 100%); color: white;">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="Profile" class="rounded-circle border border-3 border-white-50 shadow" style="width: 76px; height: 76px; object-fit: cover;">
+          {% else %}
+            <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center fw-bold shadow" style="width: 76px; height: 76px; font-size: 28px;">
+              {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <div class="overflow-hidden">
+            <h4 class="fw-bold mb-1 text-white text-truncate">{{ user.first_name }} {{ user.last_name }}</h4>
+            <div class="badge bg-light text-primary fw-semibold px-2 py-1 mb-1">
+              ID: {{ profile.employee_id|default:"EMP-NEW" }}
+            </div>
+            <div class="text-white-50 small text-truncate">
+              {{ profile.department.name|default:"General Department" }} &bull; {{ profile.designation|default:"Associate" }}
+            </div>
+          </div>
+        </div>
+
+        <hr style="border-color: rgba(255, 255, 255, 0.15);">
+
+        <div class="row g-3 text-white-50 small mt-1">
+          <div class="col-6">
+            <span class="d-block text-white fw-semibold mb-0" style="font-size: 13px;">Today's Date</span>
+            <span><i class="bi bi-calendar3 me-1"></i>{{ today_date|date:"D, d M Y" }}</span>
+          </div>
+          <div class="col-6">
+            <span class="d-block text-white fw-semibold mb-0" style="font-size: 13px;">Attendance Mode</span>
+            <span>
+              <i class="bi bi-geo-alt-fill text-success me-1"></i><strong class="text-white">Live GPS Location</strong>
+            </span>
+          </div>
+          <div class="col-6">
+            <span class="d-block text-white fw-semibold mb-0" style="font-size: 13px;">Email</span>
+            <span class="text-truncate d-block">{{ user.email|default:"Not specified" }}</span>
+          </div>
+          <div class="col-6">
+            <span class="d-block text-white fw-semibold mb-0" style="font-size: 13px;">Official Shift</span>
+            <span>{{ office_start_time }} - {{ office_closing_time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Attendance Real-Time Status Card -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-primary-subtle text-primary rounded-3 p-2">
+              <i class="bi bi-clock-history fs-5"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0 text-dark">Today's Attendance Status</h5>
+              <small class="text-muted">{{ today_date|date:"l, F d, Y" }} &bull; Shift: {{ office_start_time }} to {{ office_closing_time }}</small>
+            </div>
+          </div>
+
+          <!-- Dynamic Status Badge -->
+          <div>
+            {% if today_eval.badge_class == "badge-green" %}
+              <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-check-circle-fill me-1"></i> {{ today_eval.status }}
+              </span>
+            {% elif today_eval.badge_class == "badge-red" %}
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ today_eval.status }}
+              </span>
+            {% elif today_eval.badge_class == "badge-teal" %}
+              <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-hourglass-split me-1"></i> {{ today_eval.status }}
+              </span>
+            {% elif today_eval.badge_class == "badge-purple" %}
+              <span class="badge bg-primary-subtle text-purple border border-purple-subtle px-3 py-2 fs-6 rounded-pill" style="color: #6b21a8; background-color: #f3e8ff;">
+                <i class="bi bi-airplane-fill me-1"></i> {{ today_eval.status }}
+              </span>
+            {% elif today_eval.badge_class == "badge-blue" %}
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-calendar-event me-1"></i> {{ today_eval.status }}
+              </span>
+            {% else %}
+              <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-dash-circle me-1"></i> {{ today_eval.status }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row g-3 py-2 mb-3">
+          <!-- Punch In Time -->
+          <div class="col-sm-4">
+            <div class="p-3 bg-light rounded-3 text-center border">
+              <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 11px;">Punch In</small>
+              <div class="fs-5 fw-bold text-dark">
+                {% if today_eval.punch_in %}
+                  <span class="text-success"><i class="bi bi-box-arrow-in-right me-1"></i>{{ today_eval.punch_in|time:"h:i A" }}</span>
+                {% else %}
+                  <span class="text-muted">Not Punched</span>
+                {% endif %}
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                {% if today_eval.delay and today_eval.delay != "-" %}
+                  <span class="text-danger fw-semibold">{{ today_eval.delay }}</span>
+                {% elif today_eval.punch_in %}
+                  <span class="text-success">On-Time Arrival</span>
+                {% else %}
+                  Grace till {{ on_time_end_time }}
+                {% endif %}
+              </small>
+            </div>
+          </div>
+
+          <!-- Punch Out Time -->
+          <div class="col-sm-4">
+            <div class="p-3 bg-light rounded-3 text-center border">
+              <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 11px;">Punch Out</small>
+              <div class="fs-5 fw-bold text-dark">
+                {% if today_eval.punch_out %}
+                  <span class="text-primary"><i class="bi bi-box-arrow-right me-1"></i>{{ today_eval.punch_out|time:"h:i A" }}</span>
+                {% else %}
+                  <span class="text-muted">Not Punched</span>
+                {% endif %}
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                {% if today_eval.punch_in and not today_eval.punch_out %}
+                  <span class="text-info fw-semibold">Punch Out Pending</span>
+                {% elif today_eval.punch_out %}
+                  Shift Completed
+                {% else %}
+                  Target: {{ office_closing_time }}
+                {% endif %}
+              </small>
+            </div>
+          </div>
+
+          <!-- Working Hours -->
+          <div class="col-sm-4">
+            <div class="p-3 bg-light rounded-3 text-center border">
+              <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size: 11px;">Working Duration</small>
+              <div class="fs-5 fw-bold text-primary">
+                {{ today_eval.working_hours|default:"0h 0m" }}
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                Full Shift: {{ shift_duration }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Action Trigger Row -->
+        <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+          <a href="{% url 'employee_scanner' %}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
+            <i class="bi bi-geo-alt-fill"></i> Mark Attendance with Live Location
+          </a>
+          <a href="{% url 'employee_apply_leave' %}" class="btn btn-outline-secondary rounded-pill px-3 fw-medium d-inline-flex align-items-center gap-2">
+            <i class="bi bi-calendar-plus"></i> Apply for Leave
+          </a>
+          <a href="{% url 'employee_attendance' %}" class="btn btn-outline-primary rounded-pill px-3 fw-medium d-inline-flex align-items-center gap-2 ms-auto">
+            <i class="bi bi-calendar3"></i> Attendance History
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Monthly Attendance Summary Cards -->
+  <div class="row g-3 mb-4">
+    <!-- Total Present -->
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-success">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Present Days</span>
+          <div class="rounded-circle bg-success-subtle text-success p-2">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ month_summary.total_present|default:0 }}</div>
+        <small class="text-muted" style="font-size: 11px;">This month</small>
+      </div>
+    </div>
+
+    <!-- Total Late -->
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-danger">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Late Arrivals</span>
+          <div class="rounded-circle bg-danger-subtle text-danger p-2">
+            <i class="bi bi-alarm-fill"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-danger">{{ month_summary.total_late|default:0 }}</div>
+        <small class="text-muted" style="font-size: 11px;">Arrival > 9:35 AM</small>
+      </div>
+    </div>
+
+    <!-- Total Absent -->
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-warning">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Absent Days</span>
+          <div class="rounded-circle bg-warning-subtle text-warning p-2">
+            <i class="bi bi-dash-circle-fill"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ month_summary.total_absent|default:0 }}</div>
+        <small class="text-muted" style="font-size: 11px;">Without approved leave</small>
+      </div>
+    </div>
+
+    <!-- Approved Leaves -->
+    <div class="col-6 col-md-6 col-xl">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4" style="border-left-color: #7c3aed !important;">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Approved Leaves</span>
+          <div class="rounded-circle p-2" style="background-color: #ede9fe; color: #7c3aed;">
+            <i class="bi bi-calendar-check-fill"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold" style="color: #7c3aed;">{{ approved_leaves_count|default:0 }}</div>
+        <small class="text-muted" style="font-size: 11px;">Granted this month</small>
+      </div>
+    </div>
+
+    <!-- Pending Leaves -->
+    <div class="col-12 col-md-6 col-xl">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-info">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Pending Leaves</span>
+          <div class="rounded-circle bg-info-subtle text-info p-2">
+            <i class="bi bi-hourglass-top"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-info">{{ pending_leaves_count|default:0 }}</div>
+        <small class="text-muted" style="font-size: 11px;">Awaiting admin review</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Recent Attendance History -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h5 class="fw-bold mb-0 text-dark">Recent Attendance Records</h5>
+        <small class="text-muted">Last 7 punch activities logged in the system</small>
+      </div>
+      <a href="{% url 'employee_attendance' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+        View All History <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Date</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+            <th>Delay / Note</th>
+            <th>Verification</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in recent_records %}
+            <tr>
+              <td class="ps-3 fw-semibold text-dark">
+                {{ rec.date|date:"D, d M Y" }}
+              </td>
+              <td>
+                {% if rec.punch_in %}
+                  <span class="badge bg-light text-dark border">
+                    <i class="bi bi-box-arrow-in-right text-success me-1"></i>{{ rec.punch_in|time:"h:i A" }}
+                  </span>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if rec.punch_out %}
+                  <span class="badge bg-light text-dark border">
+                    <i class="bi bi-box-arrow-right text-primary me-1"></i>{{ rec.punch_out|time:"h:i A" }}
+                  </span>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td class="fw-medium">
+                {% if rec.working_hours %}
+                  {{ rec.working_hours }}
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if rec.status == "On Time" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-check-circle me-1"></i> On Time
+                  </span>
+                {% elif rec.status == "Late" %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-exclamation-triangle me-1"></i> Late
+                  </span>
+                {% elif rec.status == "Punch Out Pending" %}
+                  <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-hourglass-split me-1"></i> In Progress
+                  </span>
+                {% elif rec.status == "Approved Leave" %}
+                  <span class="badge rounded-pill px-2 py-1" style="background-color: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd;">
+                    <i class="bi bi-airplane me-1"></i> Leave
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">
+                    {{ rec.status|default:"Recorded" }}
+                  </span>
+                {% endif %}
+              </td>
+              <td class="small">
+                {% if rec.delay_minutes and rec.delay_minutes > 0 %}
+                  <span class="text-danger fw-semibold">Late by {{ rec.delay_minutes }} min</span>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">
+                {% if rec.verification_method == "face_biometric" %}
+                  <i class="bi bi-camera-fill text-primary me-1"></i> Face AI
+                {% elif rec.verification_method == "exempt_override" %}
+                  <i class="bi bi-shield-lock text-secondary me-1"></i> Exempt
+                {% else %}
+                  <i class="bi bi-person text-secondary me-1"></i> Standard
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-calendar-x fs-3 d-block mb-2 text-secondary"></i>
+                No attendance logs found yet. Use the Face Scanner to mark today's punch in.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

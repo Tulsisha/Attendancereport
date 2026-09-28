@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Face Verification Management | Admin Portal{% endblock %}
+{% block page_heading %}Face Verification Management{% endblock %}
+{% block page_subheading %}Biometric enrollments, audit logs, template resets, and anti-spoofing oversight{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- Summary KPI Cards -->
+  <div class="row g-3 mb-4">
+    <!-- Registered -->
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-success">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Registered Faces</span>
+          <div class="rounded-circle bg-success-subtle text-success p-2">
+            <i class="bi bi-shield-check"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ status_counts.registered }}</div>
+        <small class="text-muted" style="font-size: 11px;">Active Biometric Templates</small>
+      </div>
+    </div>
+
+    <!-- Pending -->
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-warning">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Pending Enrollment</span>
+          <div class="rounded-circle bg-warning-subtle text-warning p-2">
+            <i class="bi bi-hourglass-top"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-warning">{{ status_counts.pending }}</div>
+        <small class="text-muted" style="font-size: 11px;">Awaiting verification</small>
+      </div>
+    </div>
+
+    <!-- Re-enrollment Required -->
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-info">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Re-Enroll Required</span>
+          <div class="rounded-circle bg-info-subtle text-info p-2">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-info">{{ status_counts.re_enrollment }}</div>
+        <small class="text-muted" style="font-size: 11px;">Templates reset or flagged</small>
+      </div>
+    </div>
+
+    <!-- Not Registered -->
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100 border-start border-4 border-danger">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="text-muted fw-semibold small">Not Registered</span>
+          <div class="rounded-circle bg-danger-subtle text-danger p-2">
+            <i class="bi bi-shield-x"></i>
+          </div>
+        </div>
+        <div class="fs-2 fw-bold text-danger">{{ status_counts.not_registered }}</div>
+        <small class="text-muted" style="font-size: 11px;">No facial data captured</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Biometric Directory Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h5 class="fw-bold mb-0 text-dark">Employee Face Biometrics Directory</h5>
+        <small class="text-muted">Enrollment status and security controls for all personnel</small>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Employee</th>
+            <th>Employee ID</th>
+            <th>Department</th>
+            <th>Enrollment Status</th>
+            <th>Samples</th>
+            <th>Enrolled Date</th>
+            <th>Exemption</th>
+            <th class="text-end pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in employees %}
+            <tr>
+              <!-- Employee Name & Avatar -->
+              <td class="ps-3">
+                <div class="d-flex align-items-center gap-2">
+                  {% if emp.profile.profile_picture %}
+                    <img src="{{ emp.profile.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover;">
+                  {% else %}
+                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px; font-size: 12px;">
+                      {{ emp.first_name|default:emp.username|slice:":1"|upper }}
+                    </div>
+                  {% endif %}
+                  <div>
+                    <strong class="d-block text-dark">{{ emp.first_name }} {{ emp.last_name }}</strong>
+                    <small class="text-muted">{{ emp.username }}</small>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Employee ID -->
+              <td class="fw-semibold text-secondary">
+                {{ emp.profile.employee_id|default:"EMP-NEW" }}
+              </td>
+
+              <!-- Department -->
+              <td class="small">
+                {{ emp.profile.department.name|default:"General" }}
+              </td>
+
+              <!-- Enrollment Status -->
+              <td>
+                {% if emp.face_profile.enrollment_status == "REGISTERED" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-shield-check me-1"></i> Registered
+                  </span>
+                {% elif emp.face_profile.enrollment_status == "PENDING" %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-hourglass-split me-1"></i> Pending
+                  </span>
+                {% elif emp.face_profile.enrollment_status == "RE_ENROLLMENT_REQUIRED" %}
+                  <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-arrow-repeat me-1"></i> Re-Enroll
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-shield-x me-1"></i> Not Registered
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Samples -->
+              <td class="small fw-semibold">
+                {{ emp.face_profile.sample_count|default:0 }} sample(s)
+              </td>
+
+              <!-- Enrolled Date -->
+              <td class="small text-muted">
+                {{ emp.face_profile.enrolled_at|date:"d M Y, h:i A"|default:"&mdash;" }}
+              </td>
+
+              <!-- Exemption Status -->
+              <td class="small">
+                {% if emp.profile.face_auth_exempt %}
+                  <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill" title="{{ emp.profile.exemption_reason }}">
+                    Exempt
+                  </span>
+                {% else %}
+                  <span class="text-muted">Required</span>
+                {% endif %}
+              </td>
+
+              <!-- Actions -->
+              <td class="text-end pe-3">
+                {% if emp.face_profile.is_enrolled %}
+                  <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 reset-template-btn" data-user-id="{{ emp.id }}" data-username="{{ emp.username }}">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Face
+                  </button>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Biometric Verification Logs -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h5 class="fw-bold mb-0 text-dark">Recent Face Verification Audit Trail</h5>
+        <small class="text-muted">Live telemetry of verification attempts, confidence scores, and anti-spoofing flags</small>
+      </div>
+      <span class="badge bg-light text-secondary border">Showing Last 50 Logs</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 small">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Timestamp</th>
+            <th>Employee</th>
+            <th>Action</th>
+            <th>Status</th>
+            <th>Confidence / Message</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in recent_logs %}
+            <tr>
+              <td class="ps-3 text-muted">
+                {{ log.timestamp|date:"d M Y, H:i:s" }}
+              </td>
+              <td class="fw-semibold text-dark">
+                {{ log.user.username }}
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ log.action }}</span>
+              </td>
+              <td>
+                {% if log.status == "Verified" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-check-circle me-1"></i> Verified
+                  </span>
+                {% elif log.status == "Mismatch" %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-x-circle me-1"></i> Mismatch
+                  </span>
+                {% elif log.status == "Replay Blocked" %}
+                  <span class="badge bg-dark text-white px-2 py-1 rounded-pill">
+                    <i class="bi bi-shield-slash me-1"></i> Replay Blocked
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">
+                    {{ log.status }}
+                  </span>
+                {% endif %}
+              </td>
+              <td class="text-secondary" style="max-width: 250px;">
+                <span class="d-inline-block text-truncate" style="max-width: 240px;" title="{{ log.message }}">
+                  {{ log.message|default:"&mdash;" }}
+                </span>
+              </td>
+              <td class="text-muted">
+                {{ log.ip_address|default:"127.0.0.1" }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">
+                No biometric verification logs recorded yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- CSRF Token -->
+{% csrf_token %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Handle Template Reset
+  document.querySelectorAll('.reset-template-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const userId = btn.getAttribute('data-user-id');
+      const username = btn.getAttribute('data-username');
+
+      if (!confirm(`Are you sure you want to reset the biometric face template for ${username}? They will be required to re-enroll before marking attendance.`)) {
+        return;
+      }
+
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const formData = new FormData();
+      formData.append('user_id', userId);
+
+      try {
+        const resp = await fetch('{% url "api_reset_face" %}', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+
+        const data = await resp.json();
+        if (resp.ok && data.status === 'success') {
+          alert(`Face template for ${username} has been reset.`);
+          window.location.reload();
+        } else {
+          alert(data.message || 'Failed to reset template.');
+        }
+      } catch (err) {
+        alert('Server error during face template reset.');
+      }
+    });
+  });
+</script>
+{% endblock %}

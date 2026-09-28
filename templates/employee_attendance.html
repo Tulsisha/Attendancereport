@@ -1,0 +1,233 @@
+{% extends "employee_base.html" %}
+{% load static %}
+
+{% block title %}My Attendance | Attendance Management System{% endblock %}
+{% block page_heading %}My Attendance History{% endblock %}
+{% block page_subheading %}Daily & Monthly Attendance Log for {{ user.first_name|default:user.username }} &bull; Shift: 9:30 AM – 6:30 PM{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- Filters & Export Toolbar -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      
+      <!-- Filter Form -->
+      <form method="GET" class="d-flex flex-wrap align-items-center gap-2">
+        <div>
+          <label class="form-label small text-muted mb-1 fw-semibold">Month</label>
+          <select name="month" class="form-select form-select-sm rounded-pill px-3" style="min-width: 140px;">
+            {% for m_num, m_txt in month_names %}
+              <option value="{{ m_num }}" {% if m_num == month %}selected{% endif %}>{{ m_txt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label small text-muted mb-1 fw-semibold">Year</label>
+          <select name="year" class="form-select form-select-sm rounded-pill px-3" style="min-width: 100px;">
+            {% for y in years_list %}
+              <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="align-self-end">
+          <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-medium">
+            <i class="bi bi-filter me-1"></i> Filter
+          </button>
+        </div>
+      </form>
+
+      <!-- Export Actions -->
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'employee_export_excel' %}?year={{ year }}&month={{ month }}" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold">
+          <i class="bi bi-file-earmark-excel me-1"></i> Export Excel (.xlsx)
+        </a>
+        <a href="{% url 'employee_export_csv' %}?year={{ year }}&month={{ month }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">
+          <i class="bi bi-file-earmark-text me-1"></i> Export CSV
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Monthly KPIs Mini Ribbon -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center border-bottom border-3 border-success">
+        <small class="text-muted fw-semibold d-block">Present Days</small>
+        <span class="fs-4 fw-bold text-success">{{ summary.total_present }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center border-bottom border-3 border-danger">
+        <small class="text-muted fw-semibold d-block">Late Arrivals</small>
+        <span class="fs-4 fw-bold text-danger">{{ summary.total_late }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center border-bottom border-3 border-warning">
+        <small class="text-muted fw-semibold d-block">Absent / Closed</small>
+        <span class="fs-4 fw-bold text-warning">{{ summary.total_absent }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-6 col-xl">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center border-bottom border-3" style="border-bottom-color: #7c3aed !important;">
+        <small class="text-muted fw-semibold d-block">Approved Leaves</small>
+        <span class="fs-4 fw-bold" style="color: #7c3aed;">{{ summary.total_leaves }}</span>
+      </div>
+    </div>
+    <div class="col-6 col-md-6 col-xl">
+      <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center border-bottom border-3 border-primary">
+        <small class="text-muted fw-semibold d-block">Sundays / Holidays</small>
+        <span class="fs-4 fw-bold text-primary">{{ summary.total_holidays_or_sundays }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Color Code Legend -->
+  <div class="d-flex flex-wrap align-items-center gap-3 p-3 bg-white rounded-4 border-0 shadow-sm mb-4 small">
+    <span class="fw-bold text-secondary">Legend:</span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981;"></span>
+      <span>Green: On Time (9:30 - 9:35 AM)</span>
+    </span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444;"></span>
+      <span>Red: Late (> 9:35 AM)</span>
+    </span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #d97706;"></span>
+      <span>Yellow: Closed / Absent</span>
+    </span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #0d9488;"></span>
+      <span>Teal: Punch Out Pending</span>
+    </span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #2563eb;"></span>
+      <span>Blue: Sunday / Holiday</span>
+    </span>
+    <span class="d-inline-flex align-items-center gap-1">
+      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #7c3aed;"></span>
+      <span>Purple: Approved Leave</span>
+    </span>
+  </div>
+
+  <!-- Detailed Monthly Attendance Table -->
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-bold mb-0 text-dark">
+        {{ month_name }} {{ year }} &bull; Attendance Matrix
+      </h5>
+      <span class="badge bg-light text-secondary border">Total Days: {{ days|length }}</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3" style="width: 120px;">Date</th>
+            <th style="width: 100px;">Day</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Total Hours</th>
+            <th>Status</th>
+            <th>Delay / Remarks</th>
+            <th>Verification</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in days %}
+            <tr class="{% if row.badge_class == 'badge-green' %}table-success-subtle{% elif row.badge_class == 'badge-red' %}table-danger-subtle{% elif row.badge_class == 'badge-yellow' %}table-warning-subtle{% elif row.badge_class == 'badge-teal' %}table-info-subtle{% elif row.badge_class == 'badge-purple' %}table-purple-subtle{% elif row.badge_class == 'badge-blue' %}table-primary-subtle{% endif %}">
+              <td class="ps-3 fw-semibold text-dark">
+                {{ row.date }}
+              </td>
+              <td class="text-secondary fw-medium">
+                {{ row.day }}
+              </td>
+              <td>
+                {% if row.punch_in_formatted and row.punch_in_formatted != "-" %}
+                  <span class="badge bg-light text-dark border">
+                    <i class="bi bi-box-arrow-in-right text-success me-1"></i>{{ row.punch_in_formatted }}
+                  </span>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if row.punch_out_formatted and row.punch_out_formatted != "-" %}
+                  <span class="badge bg-light text-dark border">
+                    <i class="bi bi-box-arrow-right text-primary me-1"></i>{{ row.punch_out_formatted }}
+                  </span>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td class="fw-semibold">
+                {% if row.working_hours and row.working_hours != "-" %}
+                  {{ row.working_hours }}
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if row.badge_class == "badge-green" %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-check-circle-fill me-1"></i> On Time
+                  </span>
+                {% elif row.badge_class == "badge-red" %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Late
+                  </span>
+                {% elif row.badge_class == "badge-yellow" %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-dash-circle me-1"></i> {{ row.status }}
+                  </span>
+                {% elif row.badge_class == "badge-teal" %}
+                  <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-hourglass-split me-1"></i> Punch Out Pending
+                  </span>
+                {% elif row.badge_class == "badge-blue" %}
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill">
+                    <i class="bi bi-calendar-event me-1"></i> {{ row.status }}
+                  </span>
+                {% elif row.badge_class == "badge-purple" %}
+                  <span class="badge rounded-pill px-2 py-1" style="background-color: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd;">
+                    <i class="bi bi-airplane-fill me-1"></i> Approved Leave
+                  </span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill">
+                    {{ row.status }}
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if row.delay and row.delay != "-" %}
+                  <span class="text-danger fw-semibold small"><i class="bi bi-stopwatch me-1"></i>{{ row.delay }}</span>
+                {% else %}
+                  <span class="text-muted small">&mdash;</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted">
+                {% if row.verification_method == "face_biometric" %}
+                  <span title="Verified via biometric face scan"><i class="bi bi-camera-fill text-primary me-1"></i> Face AI</span>
+                {% elif row.verification_method == "exempt_override" %}
+                  <span title="Exempted from face authentication"><i class="bi bi-shield-check text-secondary me-1"></i> Exempted</span>
+                {% elif row.verification_method != "-" %}
+                  <span>{{ row.verification_method }}</span>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,691 @@
+/* =========================================================
+   ATTENDANCE MANAGEMENT SYSTEM - HRMS ENTERPRISE DESIGN
+   Color Palette & Typography
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-navy: #072147;
+  --secondary-navy: #0d2b5c;
+  --accent-blue: #2563eb;
+  --accent-blue-hover: #1d4ed8;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+
+  /* Official Attendance Status Colors */
+  --present-green: #10b981;
+  --present-bg: #dcfce7;
+  --present-border: #86efac;
+
+  --late-red: #ef4444;
+  --late-bg: #fee2e2;
+  --late-border: #fca5a5;
+
+  --absent-yellow: #d97706;
+  --absent-bg: #fef9c3;
+  --absent-border: #fde047;
+
+  --pending-teal: #0d9488;
+  --pending-bg: #ccfbf1;
+  --pending-border: #5eead4;
+
+  --holiday-blue: #2563eb;
+  --holiday-bg: #dbeafe;
+  --holiday-border: #93c5fd;
+
+  --leave-purple: #7c3aed;
+  --leave-bg: #ede9fe;
+  --leave-border: #c4b5fd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-main);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  background: linear-gradient(180deg, #072147 0%, #051833 100%);
+  color: #ffffff;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.sidebar .brand-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar .brand-header img {
+  height: 38px;
+  max-width: 140px;
+  object-fit: contain;
+}
+
+.sidebar .nav-list {
+  list-style: none;
+  padding: 16px 12px;
+  margin: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.sidebar .nav-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  padding: 12px 14px 6px;
+}
+
+.sidebar .nav-item {
+  margin-bottom: 4px;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.sidebar .nav-link i {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.sidebar .nav-link.active {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.sidebar .user-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   TOP NAVBAR
+========================================================= */
+
+.topbar {
+  margin-left: 260px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.topbar .page-title h4 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-navy);
+}
+
+.topbar .page-title p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.topbar .topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.clock-pill {
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-navy);
+}
+
+.clock-pill .live-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 1.5s infinite;
+}
+
+/* =========================================================
+   MAIN CONTENT AREA
+========================================================= */
+
+.main-content {
+  margin-left: 260px;
+  padding: 28px 32px 60px;
+  min-height: calc(100vh - 70px);
+}
+
+/* =========================================================
+   HRMS STATISTIC CARDS
+========================================================= */
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.stat-card .stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary-navy);
+  margin: 10px 0 2px;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   SHIFT SCHEDULE BANNER
+========================================================= */
+
+.shift-banner {
+  background: linear-gradient(135deg, #072147 0%, #1e3a8a 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 22px 28px;
+  box-shadow: 0 4px 15px rgba(7, 33, 71, 0.15);
+  margin-bottom: 24px;
+}
+
+.shift-badge {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =========================================================
+   FACE SCANNER COMPONENT (AI CAMERA PREVIEW)
+========================================================= */
+
+.scanner-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  padding: 28px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.camera-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #0f172a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  aspect-ratio: 4 / 3;
+}
+
+.camera-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror preview */
+}
+
+.camera-wrapper canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
+/* Scanning Reticle & Radar Animation */
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scanner-frame {
+  width: 240px;
+  height: 290px;
+  border: 2px dashed rgba(59, 130, 246, 0.7);
+  border-radius: 50% 50% 45% 45%;
+  position: relative;
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.45);
+}
+
+.scanner-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+  box-shadow: 0 0 15px #38bdf8;
+  animation: scanSweep 2s ease-in-out infinite;
+}
+
+@keyframes scanSweep {
+  0% { top: 5%; opacity: 0.3; }
+  50% { top: 90%; opacity: 1; }
+  100% { top: 5%; opacity: 0.3; }
+}
+
+.scanner-status-box {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.scanner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scanner-badge.badge-info {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.scanner-badge.badge-warning {
+  background-color: #fefce8;
+  color: #854d0e;
+  border: 1px solid #fef08a;
+}
+
+.scanner-badge.badge-success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.scanner-badge.badge-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* =========================================================
+   PUNCH BUTTONS
+========================================================= */
+
+.btn-punch-in {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-punch-in:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  color: #ffffff;
+}
+
+.btn-punch-out {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: none;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-punch-out:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+}
+
+/* =========================================================
+   ATTENDANCE TABLE & AUTOMATIC ROW COLOURS
+========================================================= */
+
+.attendance-table-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.table-attendance {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-attendance th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.table-attendance td {
+  padding: 14px 18px;
+  font-size: 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* MANDATORY ATTENDANCE ROW COLOUR RULES */
+
+/* Green – Present / On Time (9:30 AM – 9:35 AM) */
+tr.row-present,
+.row-present > td {
+  background-color: var(--present-bg) !important;
+  color: #065f46;
+}
+
+/* Red – Late (After 9:35 AM) */
+tr.row-late,
+.row-late > td {
+  background-color: var(--late-bg) !important;
+  color: #991b1b;
+}
+
+/* Yellow – Absent (Closed working day without valid punch) */
+tr.row-absent,
+.row-absent > td {
+  background-color: var(--absent-bg) !important;
+  color: #854d0e;
+}
+
+/* Teal – Punch Out Pending (Punched in, awaiting punch out) */
+tr.row-pending,
+.row-pending > td {
+  background-color: var(--pending-bg) !important;
+  color: #115e59;
+}
+
+/* Blue – Holiday (Sunday or Configured Company Holiday) */
+tr.row-holiday,
+.row-holiday > td {
+  background-color: var(--holiday-bg) !important;
+  color: #1e40af;
+}
+
+/* Purple – Approved Leave */
+tr.row-leave,
+.row-leave > td {
+  background-color: var(--leave-bg) !important;
+  color: #5b21b6;
+}
+
+/* Row Hover */
+.table-attendance tbody tr:hover td {
+  filter: brightness(0.96);
+  transition: filter 0.15s ease;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.badge-present {
+  background-color: #bbf7d0;
+  color: #14532d;
+  border: 1px solid var(--present-border);
+}
+
+.badge-late {
+  background-color: #fecaca;
+  color: #7f1d1d;
+  border: 1px solid var(--late-border);
+}
+
+.badge-absent {
+  background-color: #fde047;
+  color: #713f12;
+  border: 1px solid var(--absent-border);
+}
+
+.badge-pending {
+  background-color: #99f6e4;
+  color: #134e4a;
+  border: 1px solid var(--pending-border);
+}
+
+.badge-holiday {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
+  border: 1px solid var(--holiday-border);
+}
+
+.badge-leave {
+  background-color: #ddd6fe;
+  color: #4c1d95;
+  border: 1px solid var(--leave-border);
+}
+
+/* =========================================================
+   COLOR LEGEND
+========================================================= */
+
+.attendance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   PRINT STYLES FOR ATTENDANCE SHEETS
+========================================================= */
+
+@media print {
+  .sidebar,
+  .topbar,
+  .btn,
+  .card-header .btn,
+  .attendance-legend,
+  .pagination,
+  form {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .attendance-table-card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .table-attendance {
+    width: 100% !important;
+    border: 1px solid #000 !important;
+  }
+
+  .table-attendance th,
+  .table-attendance td {
+    border: 1px solid #ccc !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN (MOBILE & TABLET)
+========================================================= */
+
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .topbar,
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}

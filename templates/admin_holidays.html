@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Company Holidays | Admin Portal{% endblock %}
+{% block page_heading %}Official Holidays Calendar{% endblock %}
+{% block page_subheading %}Manage recognized national and company holidays (Sundays are automatically recognized){% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <div class="row g-4">
+    <!-- Add Holiday Form -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-3 text-primary-navy">
+          <i class="bi bi-calendar-plus me-2 text-primary"></i> Add Company Holiday
+        </h5>
+        <form action="{% url 'admin_holiday_add' %}" method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Holiday Name</label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Independence Day" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Date</label>
+            <input type="date" name="date" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Description (Optional)</label>
+            <textarea name="description" class="form-control" rows="2" placeholder="Holiday description..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Save Holiday
+          </button>
+        </form>
+
+        <div class="alert alert-info mt-4 mb-0 py-2 small">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          <strong>Sunday Rule:</strong> All Sundays are automatically categorized as official weekly holidays across all dashboards and reports.
+        </div>
+      </div>
+    </div>
+
+    <!-- Holidays List Table -->
+    <div class="col-lg-8">
+      <div class="attendance-table-card">
+        <div class="card-header bg-white p-3 border-bottom">
+          <h5 class="fw-bold mb-0 text-primary-navy">
+            <i class="bi bi-calendar-check me-2 text-primary"></i> Configured Company Holidays
+          </h5>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-attendance">
+            <thead>
+              <tr>
+                <th>Holiday Name</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for h in holidays %}
+                <tr>
+                  <td class="fw-bold">{{ h.name }}</td>
+                  <td>{{ h.date|date:"F d, Y" }}</td>
+                  <td><span class="badge bg-primary-subtle text-primary">{{ h.date|date:"l" }}</span></td>
+                  <td>{{ h.description|default:"-" }}</td>
+                  <td>
+                    <form action="{% url 'admin_holiday_delete' h.id %}" method="POST" onsubmit="return confirm('Delete holiday {{ h.name }}?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger btn-sm py-1 px-2" title="Delete Holiday">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">
+                    No custom holidays added yet. Sundays are already recognized.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Audit Trail | Admin Portal{% endblock %}
+{% block page_heading %}Attendance Correction Audit Trail{% endblock %}
+{% block page_subheading %}Complete immutable historical record of all manual attendance overrides and adjustments{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <div class="attendance-table-card">
+    <div class="card-header bg-white p-3 border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold mb-0 text-primary-navy">
+        <i class="bi bi-journal-text me-2 text-primary"></i> Manual Adjustments & Audit Entries
+      </h5>
+      <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> Print Log
+      </button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-attendance">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Employee</th>
+            <th>Attendance Date</th>
+            <th>Previous Values</th>
+            <th>Updated Values</th>
+            <th>Modified By</th>
+            <th>Reason / Justification</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+            <tr>
+              <td>
+                <div>{{ log.created_at|date:"Y-m-d" }}</div>
+                <small class="text-muted">{{ log.created_at|date:"h:i:s A" }}</small>
+              </td>
+              <td>
+                <div class="fw-bold">{{ log.attendance.user.first_name }} {{ log.attendance.user.last_name }}</div>
+                <small class="text-muted">{{ log.attendance.user.username }}</small>
+              </td>
+              <td><strong>{{ log.attendance.date|date:"Y-m-d" }}</strong></td>
+              <td>
+                <span class="badge bg-danger-subtle text-danger">
+                  In: {{ log.old_punch_in|default:"None" }} | Out: {{ log.old_punch_out|default:"None" }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-success-subtle text-success">
+                  In: {{ log.new_punch_in|default:"None" }} | Out: {{ log.new_punch_out|default:"None" }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-semibold">{{ log.modified_by.username }}</span>
+              </td>
+              <td>
+                <div class="text-wrap" style="max-width: 250px;">
+                  {{ log.reason }}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-shield-check fs-2 d-block mb-2 text-success"></i>
+                No attendance corrections logged yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

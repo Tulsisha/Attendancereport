@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Reports & Analytics | Admin Portal{% endblock %}
+{% block page_heading %}Monthly & Daily Attendance Reports{% endblock %}
+{% block page_subheading %}Generate, inspect, and export comprehensive attendance data for all employees{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+  <!-- =========================================================
+       1. REPORT FILTER & EXPORT BAR
+  ========================================================= -->
+  <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <form method="GET" class="row g-2 align-items-center">
+      <!-- Month -->
+      <div class="col-md-2">
+        <label class="form-label small text-muted mb-1">Month</label>
+        <select name="month" class="form-select form-select-sm">
+          {% for m_num, m_name in month_names %}
+            <option value="{{ m_num }}" {% if m_num == month %}selected{% endif %}>{{ m_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Year -->
+      <div class="col-md-2">
+        <label class="form-label small text-muted mb-1">Year</label>
+        <select name="year" class="form-select form-select-sm">
+          {% for y in years_list %}
+            <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Department -->
+      <div class="col-md-2">
+        <label class="form-label small text-muted mb-1">Department</label>
+        <select name="department" class="form-select form-select-sm">
+          <option value="">All Departments</option>
+          {% for d in departments %}
+            <option value="{{ d.id }}" {% if selected_dept == d.id|stringformat:"i" %}selected{% endif %}>{{ d.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Specific Employee -->
+      <div class="col-md-3">
+        <label class="form-label small text-muted mb-1">Specific Employee</label>
+        <select name="employee" class="form-select form-select-sm">
+          <option value="">All Registered Employees</option>
+          {% for e in employees %}
+            <option value="{{ e.id }}" {% if selected_emp == e.id|stringformat:"i" %}selected{% endif %}>
+              {{ e.username }} ({{ e.first_name }} {{ e.last_name }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Submit Filter -->
+      <div class="col-md-3 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold">
+          <i class="bi bi-funnel me-1"></i> Generate
+        </button>
+        <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Export Actions Bar -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="text-muted small">
+      Showing Report for: <strong>{{ month_name }} {{ year }}</strong> ({{ reports_data|length }} employees)
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'export_attendance_excel' %}?month={{ month }}&year={{ year }}&employee={{ selected_emp }}" class="btn btn-success btn-sm fw-bold">
+        <i class="bi bi-file-earmark-excel me-1"></i> Export Excel (.xlsx)
+      </a>
+      <a href="{% url 'export_attendance_csv' %}?month={{ month }}&year={{ year }}&employee={{ selected_emp }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-filetype-csv me-1"></i> Export CSV
+      </a>
+      <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> Print All Reports
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. AGGREGATED EMPLOYEE ATTENDANCE SUMMARIES
+  ========================================================= -->
+  <div class="attendance-table-card mb-4">
+    <div class="card-header bg-white p-3 border-bottom">
+      <h5 class="fw-bold mb-0 text-primary-navy">
+        <i class="bi bi-bar-chart-fill me-2 text-primary"></i> Employee Attendance Summary Table
+      </h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-attendance">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Emp ID</th>
+            <th>Department</th>
+            <th>Scheduled Days</th>
+            <th>Present (On Time)</th>
+            <th>Late</th>
+            <th>Absent</th>
+            <th>Pending Out</th>
+            <th>Attendance %</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in reports_data %}
+            <tr>
+              <td>
+                <div class="fw-bold">{{ item.employee.first_name }} {{ item.employee.last_name }}</div>
+                <small class="text-muted">{{ item.employee.username }}</small>
+              </td>
+              <td><strong>{{ item.profile.employee_id|default:"N/A" }}</strong></td>
+              <td>{{ item.profile.department.name|default:"General" }}</td>
+              <td>{{ item.summary.scheduled_working_days }}</td>
+              <td><span class="badge bg-success-subtle text-success">{{ item.summary.present_count }}</span></td>
+              <td><span class="badge bg-danger-subtle text-danger">{{ item.summary.late_count }}</span></td>
+              <td><span class="badge bg-warning-subtle text-warning">{{ item.summary.absent_count }}</span></td>
+              <td><span class="badge bg-info-subtle text-info">{{ item.summary.pending_count }}</span></td>
+              <td>
+                <strong>{{ item.summary.attendance_percentage }}%</strong>
+              </td>
+              <td>
+                <a href="{% url 'attendance_report' %}?employee_id={{ item.employee.id }}&month={{ month }}&year={{ year }}" class="btn btn-outline-primary btn-sm py-1 px-2" title="Inspect Monthly Matrix">
+                  <i class="bi bi-calendar-month"></i> View Matrix
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="10" class="text-center py-4 text-muted">No employees found matching criteria.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
