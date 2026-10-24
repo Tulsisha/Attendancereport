@@ -87,32 +87,32 @@
   </div>
 
   <!-- Color Code Legend -->
-  <div class="d-flex flex-wrap align-items-center gap-3 p-3 bg-white rounded-4 border-0 shadow-sm mb-4 small">
-    <span class="fw-bold text-secondary">Legend:</span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #10b981;"></span>
-      <span>Green: On Time (9:30 - 9:35 AM)</span>
-    </span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #ef4444;"></span>
-      <span>Red: Late (> 9:35 AM)</span>
-    </span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #d97706;"></span>
-      <span>Yellow: Closed / Absent</span>
-    </span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #0d9488;"></span>
-      <span>Teal: Punch Out Pending</span>
-    </span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #2563eb;"></span>
-      <span>Blue: Sunday / Holiday</span>
-    </span>
-    <span class="d-inline-flex align-items-center gap-1">
-      <span class="rounded-circle" style="width: 12px; height: 12px; background-color: #7c3aed;"></span>
-      <span>Purple: Approved Leave</span>
-    </span>
+  <div class="attendance-legend mb-4">
+    <span class="fw-bold text-secondary me-2"><i class="bi bi-palette me-1"></i> Attendance Status Legend:</span>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--present-bg); border-color: var(--present-green);"></span>
+      <span><strong>Green:</strong> On Time (9:30 – 9:35 AM)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--late-bg); border-color: var(--late-red);"></span>
+      <span><strong>Red:</strong> Late (> 9:35 AM)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--pending-bg); border-color: var(--pending-teal);"></span>
+      <span><strong>Teal:</strong> Punch Out Pending</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--absent-bg); border-color: var(--absent-yellow);"></span>
+      <span><strong>Yellow:</strong> Closed / Absent</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--holiday-bg); border-color: var(--holiday-blue);"></span>
+      <span><strong>Blue:</strong> Sunday / Holiday</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background-color: var(--leave-bg); border-color: var(--leave-purple);"></span>
+      <span><strong>Purple:</strong> Approved Leave</span>
+    </div>
   </div>
 
   <!-- Detailed Monthly Attendance Table -->
@@ -125,7 +125,7 @@
     </div>
 
     <div class="table-responsive">
-      <table class="table align-middle table-hover mb-0">
+      <table class="table align-middle table-hover mb-0 table-attendance">
         <thead class="table-light">
           <tr>
             <th class="ps-3" style="width: 120px;">Date</th>
@@ -140,7 +140,7 @@
         </thead>
         <tbody>
           {% for row in days %}
-            <tr class="{% if row.badge_class == 'badge-green' %}table-success-subtle{% elif row.badge_class == 'badge-red' %}table-danger-subtle{% elif row.badge_class == 'badge-yellow' %}table-warning-subtle{% elif row.badge_class == 'badge-teal' %}table-info-subtle{% elif row.badge_class == 'badge-purple' %}table-purple-subtle{% elif row.badge_class == 'badge-blue' %}table-primary-subtle{% endif %}">
+            <tr class="{{ row.row_class }} row-{{ row.status_color }}">
               <td class="ps-3 fw-semibold text-dark">
                 {{ row.date }}
               </td>
@@ -173,32 +173,32 @@
                 {% endif %}
               </td>
               <td>
-                {% if row.badge_class == "badge-green" %}
-                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
+                {% if row.status_color == "green" or row.row_class == "row-present" %}
+                  <span class="status-badge badge-present">
                     <i class="bi bi-check-circle-fill me-1"></i> On Time
                   </span>
-                {% elif row.badge_class == "badge-red" %}
-                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
+                {% elif row.status_color == "red" or row.row_class == "row-late" %}
+                  <span class="status-badge badge-late">
                     <i class="bi bi-exclamation-triangle-fill me-1"></i> Late
                   </span>
-                {% elif row.badge_class == "badge-yellow" %}
-                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">
-                    <i class="bi bi-dash-circle me-1"></i> {{ row.status }}
+                {% elif row.status_color == "yellow" or row.row_class == "row-absent" %}
+                  <span class="status-badge badge-absent">
+                    <i class="bi bi-x-circle-fill me-1"></i> Absent
                   </span>
-                {% elif row.badge_class == "badge-teal" %}
-                  <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">
+                {% elif row.status_color == "teal" or row.row_class == "row-pending" %}
+                  <span class="status-badge badge-pending">
                     <i class="bi bi-hourglass-split me-1"></i> Punch Out Pending
                   </span>
-                {% elif row.badge_class == "badge-blue" %}
-                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill">
+                {% elif row.status_color == "blue" or row.row_class == "row-holiday" %}
+                  <span class="status-badge badge-holiday">
                     <i class="bi bi-calendar-event me-1"></i> {{ row.status }}
                   </span>
-                {% elif row.badge_class == "badge-purple" %}
-                  <span class="badge rounded-pill px-2 py-1" style="background-color: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd;">
-                    <i class="bi bi-airplane-fill me-1"></i> Approved Leave
+                {% elif row.status_color == "purple" or row.row_class == "row-leave" %}
+                  <span class="status-badge badge-leave">
+                    <i class="bi bi-airplane-fill me-1"></i> {{ row.status }}
                   </span>
                 {% else %}
-                  <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill">
+                  <span class="status-badge badge-secondary">
                     {{ row.status }}
                   </span>
                 {% endif %}

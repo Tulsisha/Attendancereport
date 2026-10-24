@@ -30,3 +30,5 @@ services:
         value: "https://*.onrender.com"
       - key: SECURE_SSL_REDIRECT
         value: "True"
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false

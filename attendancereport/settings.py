@@ -67,6 +67,9 @@ if render_external_hostname:
 if 'RENDER' in os.environ and 'https://*.onrender.com' not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append('https://*.onrender.com')
 
+# Google Maps API Configuration
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+
 
 # Application definition
 

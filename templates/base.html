@@ -37,13 +37,17 @@
     {% endif %}
   </div>
 
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
   <!-- Sidebar -->
   <aside class="sidebar" id="appSidebar">
+    <!-- Brand Header: Block Layout with stacked logo, title and subtitle -->
     <div class="brand-header">
       <img src="{% static 'images/krishny-logo.png' %}" alt="Logo" onerror="this.src='{% static 'images/logo.png' %}'">
-      <div>
-        <div class="fw-bold fs-6 text-white leading-tight">HRMS Portal</div>
-        <small class="text-white-50" style="font-size: 11px;">Attendance Suite</small>
+      <div class="brand-text-block">
+        <div class="brand-title">HRMS Portal</div>
+        <small class="brand-subtitle">Attendance Suite</small>
       </div>
     </div>
 
@@ -172,13 +176,13 @@
 
   <!-- Topbar -->
   <header class="topbar">
-    <div class="d-flex align-items-center gap-3">
-      <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggleBtn" type="button">
+    <div class="topbar-left">
+      <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggleBtn" type="button" aria-label="Toggle navigation">
         <i class="bi bi-list fs-5"></i>
       </button>
       <div class="page-title">
         <h4>{% block page_heading %}Dashboard{% endblock %}</h4>
-        <p>{% block page_subheading %}Official Shift: 9:30 AM – 6:30 PM (9.0 Hours){% endblock %}</p>
+        <p class="mb-0">{% block page_subheading %}Official Shift: 9:30 AM – 6:30 PM (9.0 Hours){% endblock %}</p>
       </div>
     </div>
 
@@ -189,6 +193,20 @@
         <i class="bi bi-clock-history text-primary"></i>
         <span id="liveClockDisplay">--:--:--</span>
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" style="font-size: 10px;">IST</span>
+      </div>
+
+      <!-- User Profile Dropdown Pill -->
+      <div class="d-flex align-items-center gap-2 ps-2 border-start user-profile-pill">
+        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold border border-primary-subtle" style="width: 36px; height: 36px; font-size: 14px;">
+          {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+        </div>
+        <div class="d-none d-sm-block text-start leading-tight">
+          <div class="fw-bold text-dark user-name-text" style="font-size: 13px;">{{ request.user.first_name|default:request.user.username }}</div>
+          <small class="text-muted" style="font-size: 11px;">{% if request.user.is_superuser %}Admin{% else %}Employee{% endif %}</small>
+        </div>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill ms-2 logout-btn" title="Logout" style="font-size: 12px; padding: 4px 10px;">
+          <i class="bi bi-power"></i> <span class="d-none d-sm-inline">Logout</span>
+        </a>
       </div>
     </div>
   </header>
@@ -209,7 +227,6 @@
     // Live Clock updater (Asia/Kolkata IST)
     function updateLiveClock() {
       const now = new Date();
-      // Format in Asia/Kolkata timezone
       const timeStr = now.toLocaleTimeString('en-IN', {
         timeZone: 'Asia/Kolkata',
         hour: '2-digit',
@@ -223,13 +240,35 @@
     setInterval(updateLiveClock, 1000);
     updateLiveClock();
 
-    // Mobile sidebar toggle
+    // Mobile sidebar toggle and backdrop handling
     const toggleBtn = document.getElementById('sidebarToggleBtn');
     const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.add('show');
+      if (backdrop) backdrop.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.remove('show');
+      if (backdrop) backdrop.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
     if (toggleBtn && sidebar) {
-      toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sidebar.classList.contains('show')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
       });
+    }
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeSidebar);
     }
 
     // Auto-dismiss toasts after 5 seconds

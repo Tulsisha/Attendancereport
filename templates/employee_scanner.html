@@ -6,8 +6,6 @@
 {% block page_subheading %}Verified GPS Geolocation Attendance &bull; Shift: {{ office_start_time }} – {{ office_closing_time }} (9.0 Hours){% endblock %}
 
 {% block extra_css %}
-<!-- Leaflet OpenStreetMap CSS for lightweight interactive live location map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
   .location-card {
     background: #0f172a;
@@ -22,6 +20,46 @@
     border-radius: 16px;
     overflow: hidden;
     border: 2px solid rgba(255, 255, 255, 0.1);
+    background: #1e293b;
+    position: relative;
+  }
+  .map-fallback-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+  }
+  .map-pulse-radar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.2);
+    border: 2px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #60a5fa;
+    position: relative;
+    margin-bottom: 16px;
+    animation: radarPulse 2s infinite ease-out;
+  }
+  @keyframes radarPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 24px rgba(59, 130, 246, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
   }
   .gps-status-pill {
     display: inline-flex;
@@ -29,7 +67,7 @@
     gap: 8px;
     padding: 8px 20px;
     border-radius: 30px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
   }
   .gps-active {
@@ -48,8 +86,8 @@
     border: 1px solid rgba(239, 68, 68, 0.4);
   }
   .btn-punch-action {
-    height: 54px;
-    font-size: 16px;
+    height: 52px;
+    font-size: 15px;
     font-weight: 700;
     border-radius: 50px;
     display: inline-flex;
@@ -61,6 +99,11 @@
   .btn-punch-action:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+  @media (max-width: 768px) {
+    #liveMapContainer {
+      height: 300px;
+    }
   }
 </style>
 {% endblock %}
@@ -89,7 +132,7 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-25">
           <div class="d-flex align-items-center gap-2">
             <span class="live-indicator"></span>
-            <span class="fw-bold fs-6 text-white">Live Geolocation Tracking</span>
+            <span class="fw-bold fs-6 text-white">Google Maps Geolocation Tracking</span>
           </div>
           <div class="text-white-50 small d-flex align-items-center gap-1">
             <i class="bi bi-clock-history text-primary"></i>
@@ -97,12 +140,26 @@
           </div>
         </div>
 
-        <!-- Live Interactive OpenStreetMap View -->
+        <!-- Live Interactive Google Maps View with Fallback Container -->
         <div class="position-relative mb-3">
-          <div id="liveMapContainer"></div>
+          <div id="liveMapContainer">
+            <!-- Default placeholder until map initializes or fallback activates -->
+            <div class="map-fallback-view" id="mapFallbackView">
+              <div class="map-pulse-radar">
+                <i class="bi bi-geo-alt-fill"></i>
+              </div>
+              <h6 class="fw-bold text-white mb-1" id="fallbackTitle">Acquiring GPS Position...</h6>
+              <p class="text-white-50 small mb-2" id="fallbackSubtitle" style="max-width: 440px;">
+                Connecting to device satellite navigation sensors to pinpoint your verified office location.
+              </p>
+              <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2" id="fallbackCoordinates">
+                <span class="spinner-border spinner-border-sm me-1"></span> Locating device...
+              </div>
+            </div>
+          </div>
           
           <!-- Map Overlay Details -->
-          <div class="position-absolute bottom-0 start-0 end-0 p-3 m-2 rounded-3 bg-dark bg-opacity-75 backdrop-blur border border-white border-opacity-10 d-flex flex-wrap align-items-center justify-content-between gap-2" style="z-index: 1000;">
+          <div class="position-absolute bottom-0 start-0 end-0 p-3 m-2 rounded-3 bg-dark bg-opacity-75 backdrop-blur border border-white border-opacity-10 d-flex flex-wrap align-items-center justify-content-between gap-2" style="z-index: 10;">
             <div class="text-start">
               <small class="text-white-50 d-block" style="font-size: 11px;">DETECTED CURRENT ADDRESS</small>
               <div class="fw-bold text-white small" id="detectedAddressDisplay">
@@ -129,7 +186,7 @@
           </button>
         </div>
 
-        <!-- BUTTONS ROW: Punch In & Punch Out (Addressing Screenshot 2) -->
+        <!-- BUTTONS ROW: Punch In & Punch Out -->
         <div class="row g-3">
           <!-- Punch In Button -->
           <div class="col-sm-6">
@@ -198,21 +255,29 @@
         <div class="p-3 bg-light rounded-3 border mb-3">
           <div class="d-flex justify-content-between align-items-center mb-1">
             <small class="text-muted fw-semibold">Today's Status</small>
-            {% if today_eval.badge_class == "badge-green" %}
-              <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+            {% if today_eval.status_color == "green" or today_eval.badge_class == "badge-present" or "Present" in today_eval.status %}
+              <span class="status-badge badge-present">
                 On Time
               </span>
-            {% elif today_eval.badge_class == "badge-red" %}
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">
+            {% elif today_eval.status_color == "red" or today_eval.badge_class == "badge-late" or "Late" in today_eval.status %}
+              <span class="status-badge badge-late">
                 Late Arrival
               </span>
-            {% elif today_eval.badge_class == "badge-teal" %}
-              <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1 rounded-pill">
+            {% elif today_eval.status_color == "teal" or today_eval.badge_class == "badge-pending" or "Pending" in today_eval.status %}
+              <span class="status-badge badge-pending">
                 Punch Out Pending
               </span>
+            {% elif today_eval.status_color == "purple" or today_eval.badge_class == "badge-leave" or "Leave" in today_eval.status %}
+              <span class="status-badge badge-leave">
+                Approved Leave
+              </span>
+            {% elif today_eval.status_color == "blue" or today_eval.badge_class == "badge-holiday" or "Holiday" in today_eval.status %}
+              <span class="status-badge badge-holiday">
+                Holiday
+              </span>
             {% else %}
-              <span class="badge bg-secondary-subtle text-secondary px-3 py-1 rounded-pill">
-                {{ today_eval.status }}
+              <span class="status-badge badge-secondary">
+                {{ today_eval.status|default:"Not Punched" }}
               </span>
             {% endif %}
           </div>
@@ -264,15 +329,20 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Leaflet JS for OpenStreetMap -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Google Maps JavaScript API (loaded dynamically or directly if key is configured) -->
+{% if google_maps_api_key %}
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places,geocoding&callback=initGoogleMap" async defer></script>
+{% endif %}
 
 <script>
   let currentLat = null;
   let currentLng = null;
-  let currentLocationText = 'Location unavailable';
-  let leafletMap = null;
+  let currentLocationText = 'Office Premises / Live Location';
+  let googleMap = null;
   let mapMarker = null;
+  let infoWindow = null;
+  let googleMapsLoaded = false;
+  const apiKeyConfigured = {{ google_maps_api_key|yesno:"true,false" }};
 
   const alertBanner = document.getElementById('attendanceAlertBanner');
   const alertIcon = document.getElementById('alertIcon');
@@ -284,6 +354,7 @@
   const gpsStatusIcon = document.getElementById('gpsStatusIcon');
   const detectedAddress = document.getElementById('detectedAddressDisplay');
   const gpsCoordsDisplay = document.getElementById('gpsCoordsDisplay');
+  const mapContainer = document.getElementById('liveMapContainer');
 
   function showAlert(title, msg, type = 'success') {
     alertBanner.className = `alert alert-${type} rounded-4 shadow-sm mb-4 d-block`;
@@ -293,46 +364,115 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function initMap(lat, lng) {
-    if (!leafletMap) {
-      leafletMap = L.map('liveMapContainer').setView([lat, lng], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(leafletMap);
+  // Graceful Google Maps Auth Failure Handling
+  window.gm_authFailure = function() {
+    console.warn('Google Maps authentication failed or key restricted.');
+    showFallbackRadar('Google Maps API key authentication error. Geolocation punch remains 100% active.');
+  };
 
-      mapMarker = L.marker([lat, lng]).addTo(leafletMap)
-        .bindPopup('<b>Your Current Location</b><br>Attendance verified here.')
-        .openPopup();
-    } else {
-      leafletMap.setView([lat, lng], 15);
-      if (mapMarker) {
-        mapMarker.setLatLng([lat, lng]);
+  function showFallbackRadar(message) {
+    const fallbackView = document.getElementById('mapFallbackView');
+    if (fallbackView) {
+      document.getElementById('fallbackTitle').textContent = 'Live Geolocation Active';
+      document.getElementById('fallbackSubtitle').textContent = message || 'Device GPS satellite positioning is active. Attendance records will be accurately stamped with your coordinates.';
+      if (currentLat && currentLng) {
+        document.getElementById('fallbackCoordinates').textContent = `${currentLat.toFixed(5)}° N, ${currentLng.toFixed(5)}° E`;
       }
     }
   }
 
-  // Reverse Geocoding via Nominatim
-  async function reverseGeocode(lat, lng) {
+  // Called automatically by Google Maps script callback
+  window.initGoogleMap = function() {
+    googleMapsLoaded = true;
+    if (currentLat && currentLng) {
+      renderGoogleMap(currentLat, currentLng);
+    }
+  };
+
+  function renderGoogleMap(lat, lng) {
+    if (!googleMapsLoaded || typeof google === 'undefined' || !google.maps) {
+      showFallbackRadar('Interactive map loaded in high-precision GPS mode.');
+      return;
+    }
+
     try {
-      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
-        headers: { 'Accept': 'application/json' }
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        const a = data.address || {};
-        const area = a.suburb || a.neighbourhood || a.road || '';
-        const city = a.city || a.town || a.village || a.county || '';
-        const state = a.state || '';
-        const country = a.country || '';
-        
-        let formatted = [area, city, state, country].filter(Boolean).join(', ');
-        return formatted || data.display_name || 'Location detected';
+      const position = { lat: lat, lng: lng };
+      
+      if (!googleMap) {
+        googleMap = new google.maps.Map(mapContainer, {
+          center: position,
+          zoom: 16,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: true,
+          zoomControl: true,
+          styles: [
+            { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "visibility": "off" }] },
+            { "featureType": "poi", "stylers": [{ "visibility": "simplified" }] }
+          ]
+        });
+
+        mapMarker = new google.maps.Marker({
+          position: position,
+          map: googleMap,
+          title: "Your Verified Attendance Location",
+          animation: google.maps.Animation.DROP
+        });
+
+        infoWindow = new google.maps.InfoWindow({
+          content: `<div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 6px 8px; color: #0f172a;">
+                      <div style="font-weight: 700; font-size: 13px; color: #1e40af;"><i class="bi bi-geo-alt-fill"></i> Verified Punch Location</div>
+                      <div style="font-size: 12px; color: #475569; margin-top: 3px;">${currentLocationText}</div>
+                    </div>`
+        });
+
+        infoWindow.open(googleMap, mapMarker);
+
+        mapMarker.addListener('click', () => {
+          infoWindow.open(googleMap, mapMarker);
+        });
+      } else {
+        googleMap.setCenter(position);
+        if (mapMarker) {
+          mapMarker.setPosition(position);
+        }
+        if (infoWindow) {
+          infoWindow.setContent(`<div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 6px 8px; color: #0f172a;">
+                                   <div style="font-weight: 700; font-size: 13px; color: #1e40af;"><i class="bi bi-geo-alt-fill"></i> Verified Punch Location</div>
+                                   <div style="font-size: 12px; color: #475569; margin-top: 3px;">${currentLocationText}</div>
+                                 </div>`);
+        }
       }
     } catch (err) {
-      console.warn('Reverse geocode failed:', err);
+      console.warn('Error initializing Google Maps instance:', err);
+      showFallbackRadar('Device GPS active (Google Maps rendering in high-accuracy mode).');
     }
-    return `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+  }
+
+  // Reverse Geocoding with Google Geocoder (or fallback)
+  function reverseGeocodeWithGoogle(lat, lng) {
+    if (googleMapsLoaded && typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat: lat, lng: lng } }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          currentLocationText = results[0].formatted_address;
+          detectedAddress.textContent = currentLocationText;
+          if (infoWindow && googleMap && mapMarker) {
+            infoWindow.setContent(`<div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 6px 8px; color: #0f172a;">
+                                     <div style="font-weight: 700; font-size: 13px; color: #1e40af;"><i class="bi bi-geo-alt-fill"></i> Verified Punch Location</div>
+                                     <div style="font-size: 12px; color: #475569; margin-top: 3px;">${currentLocationText}</div>
+                                   </div>`);
+          }
+        } else {
+          currentLocationText = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+          detectedAddress.textContent = currentLocationText;
+        }
+      });
+    } else {
+      currentLocationText = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+      detectedAddress.textContent = currentLocationText;
+    }
   }
 
   // Detect Live GPS Location
@@ -347,28 +487,37 @@
       gpsStatusIcon.className = 'bi bi-x-circle-fill me-1';
       gpsStatusText.textContent = 'Geolocation not supported by browser';
       detectedAddress.textContent = 'Location unavailable';
+      showFallbackRadar('Geolocation sensor is not supported by your browser.');
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
+      (pos) => {
         currentLat = pos.coords.latitude;
         currentLng = pos.coords.longitude;
-        const accuracy = Math.round(pos.coords.accuracy);
+        const accuracy = Math.round(pos.coords.accuracy || 10);
 
         gpsCoordsDisplay.textContent = `${currentLat.toFixed(5)}° N, ${currentLng.toFixed(5)}° E (±${accuracy}m)`;
         
-        currentLocationText = await reverseGeocode(currentLat, currentLng);
-        detectedAddress.textContent = currentLocationText;
-
         gpsStatusPill.className = 'gps-status-pill gps-active';
         gpsStatusIcon.className = 'bi bi-geo-alt-fill me-1';
-        gpsStatusText.textContent = `GPS Active (Accurate to ${accuracy} meters)`;
+        gpsStatusText.textContent = `GPS Active (Accurate to ${accuracy}m)`;
 
-        initMap(currentLat, currentLng);
+        const fallbackCoords = document.getElementById('fallbackCoordinates');
+        if (fallbackCoords) {
+          fallbackCoords.textContent = `${currentLat.toFixed(5)}° N, ${currentLng.toFixed(5)}° E (±${accuracy}m)`;
+        }
+
+        reverseGeocodeWithGoogle(currentLat, currentLng);
+
+        if (apiKeyConfigured && googleMapsLoaded) {
+          renderGoogleMap(currentLat, currentLng);
+        } else {
+          showFallbackRadar('GPS lock established. Punch In and Out buttons are ready.');
+        }
       },
       (err) => {
-        console.warn('Geolocation error:', err);
+        console.warn('Geolocation warning / permission denied:', err);
         // Fallback default coordinates (e.g. Mumbai / office default)
         currentLat = 19.0760;
         currentLng = 72.8777;
@@ -376,13 +525,22 @@
         
         gpsStatusPill.className = 'gps-status-pill gps-active';
         gpsStatusIcon.className = 'bi bi-geo-alt-fill me-1';
-        gpsStatusText.textContent = 'Location Enabled';
+        gpsStatusText.textContent = 'Location Acquired';
         detectedAddress.textContent = currentLocationText;
         gpsCoordsDisplay.textContent = `${currentLat.toFixed(4)}° N, ${currentLng.toFixed(4)}° E`;
 
-        initMap(currentLat, currentLng);
+        const fallbackCoords = document.getElementById('fallbackCoordinates');
+        if (fallbackCoords) {
+          fallbackCoords.textContent = `${currentLat.toFixed(4)}° N, ${currentLng.toFixed(4)}° E`;
+        }
+
+        if (apiKeyConfigured && googleMapsLoaded) {
+          renderGoogleMap(currentLat, currentLng);
+        } else {
+          showFallbackRadar('Office default GPS coordinates applied.');
+        }
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 9000, maximumAge: 0 }
     );
   }
 
@@ -431,7 +589,7 @@
 
         setTimeout(() => {
           window.location.reload();
-        }, 2200);
+        }, 2000);
       } else {
         showAlert('Attendance Submission Notice', data.message || 'Could not record attendance.', 'danger');
       }
@@ -456,7 +614,7 @@
     detectLiveLocation();
   });
 
-  // Auto-detect on page load
+  // Auto-detect GPS coordinates on page load
   window.addEventListener('DOMContentLoaded', () => {
     detectLiveLocation();
   });

@@ -27,10 +27,10 @@
         <form method="POST" action="{% url 'employee_apply_leave' %}" enctype="multipart/form-data" id="leaveApplicationForm">
           {% csrf_token %}
 
-          <!-- Leave Type -->
+          <!-- Leave Type (Configured with 15px font size) -->
           <div class="mb-4">
             <label class="form-label fw-bold text-dark">Leave Type <span class="text-danger">*</span></label>
-            <select name="leave_type" class="form-select form-select-lg rounded-3" required id="leaveTypeSelect">
+            <select name="leave_type" class="form-select leave-type-select rounded-3" required id="leaveTypeSelect">
               <option value="" disabled selected>-- Select Leave Category --</option>
               <option value="Casual Leave">Casual Leave (CL)</option>
               <option value="Sick Leave">Sick Leave (SL)</option>
@@ -44,11 +44,11 @@
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label class="form-label fw-bold text-dark">Start Date <span class="text-danger">*</span></label>
-              <input type="date" name="from_date" id="fromDateInput" class="form-control form-control-lg rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
+              <input type="date" name="from_date" id="fromDateInput" class="form-control rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold text-dark">End Date <span class="text-danger">*</span></label>
-              <input type="date" name="to_date" id="toDateInput" class="form-control form-control-lg rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
+              <input type="date" name="to_date" id="toDateInput" class="form-control rounded-3" required value="{{ today_date|date:'Y-m-d' }}">
             </div>
           </div>
 
@@ -74,11 +74,11 @@
           <hr class="my-4">
 
           <!-- Submit Buttons -->
-          <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
             <a href="{% url 'employee_leave_requests' %}" class="btn btn-outline-secondary rounded-pill px-4">
               Cancel
             </a>
-            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm" style="height: 46px;">
               <i class="bi bi-send me-1"></i> Submit Application
             </button>
           </div>

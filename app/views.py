@@ -375,6 +375,7 @@ def employee_scanner(request):
         "office_start_time": OFFICE_START_TIME.strftime("%I:%M %p"),
         "on_time_end_time": ON_TIME_END_TIME.strftime("%I:%M %p"),
         "office_closing_time": OFFICE_CLOSING_TIME.strftime("%I:%M %p"),
+        "google_maps_api_key": getattr(settings, 'GOOGLE_MAPS_API_KEY', ''),
     }
 
     return render(request, "employee_scanner.html", context)

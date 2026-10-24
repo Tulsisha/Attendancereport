@@ -37,13 +37,17 @@
     {% endif %}
   </div>
 
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
   <!-- Employee Sidebar -->
   <aside class="sidebar" id="appSidebar">
+    <!-- Brand Header: Block Layout with stacked logo, title and subtitle -->
     <div class="brand-header">
       <img src="{% static 'images/krishny-logo.png' %}" alt="Logo" onerror="this.src='{% static 'images/logo.png' %}'">
-      <div>
-        <div class="fw-bold fs-6 text-white leading-tight">Employee Portal</div>
-        <small class="text-white-50" style="font-size: 11px;">Self Service HRMS</small>
+      <div class="brand-text-block">
+        <div class="brand-title">Employee Portal</div>
+        <small class="brand-subtitle">Self Service HRMS</small>
       </div>
     </div>
 
@@ -146,19 +150,19 @@
 
   <!-- Topbar -->
   <header class="topbar">
-    <div class="d-flex align-items-center gap-3">
-      <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggleBtn" type="button">
+    <div class="topbar-left">
+      <button class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggleBtn" type="button" aria-label="Toggle navigation">
         <i class="bi bi-list fs-5"></i>
       </button>
       <div class="page-title">
         <h4>{% block page_heading %}Employee Dashboard{% endblock %}</h4>
-        <p>{% block page_subheading %}Shift Timing: 9:30 AM – 6:30 PM (9.0 Hours){% endblock %}</p>
+        <p class="mb-0">{% block page_subheading %}Shift Timing: 9:30 AM – 6:30 PM (9.0 Hours){% endblock %}</p>
       </div>
     </div>
 
     <div class="topbar-actions">
       <!-- Shift Timing Badge -->
-      <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border" style="font-size: 13px;">
+      <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border shift-pill" style="font-size: 13px;">
         <i class="bi bi-briefcase text-primary"></i>
         <span class="fw-semibold text-secondary">Shift: 9:30 AM - 6:30 PM</span>
       </div>
@@ -172,7 +176,7 @@
       </div>
 
       <!-- User Profile Dropdown Pill -->
-      <div class="d-flex align-items-center gap-2 ps-2 border-start">
+      <div class="d-flex align-items-center gap-2 ps-2 border-start user-profile-pill">
         {% if request.user.profile.profile_picture %}
           <img src="{{ request.user.profile.profile_picture.url }}" alt="Profile" class="rounded-circle border" style="width: 36px; height: 36px; object-fit: cover;">
         {% else %}
@@ -181,11 +185,11 @@
           </div>
         {% endif %}
         <div class="d-none d-sm-block text-start leading-tight">
-          <div class="fw-bold text-dark" style="font-size: 13px;">{{ request.user.first_name|default:request.user.username }}</div>
+          <div class="fw-bold text-dark user-name-text" style="font-size: 13px;">{{ request.user.first_name|default:request.user.username }}</div>
           <small class="text-muted" style="font-size: 11px;">{{ request.user.profile.employee_id|default:"EMP-ID" }}</small>
         </div>
-        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill ms-2" title="Logout" style="font-size: 12px; padding: 4px 10px;">
-          <i class="bi bi-power"></i> Logout
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill ms-2 logout-btn" title="Logout" style="font-size: 12px; padding: 4px 10px;">
+          <i class="bi bi-power"></i> <span class="d-none d-sm-inline">Logout</span>
         </a>
       </div>
     </div>
@@ -220,13 +224,35 @@
     setInterval(updateLiveClock, 1000);
     updateLiveClock();
 
-    // Mobile sidebar toggle
+    // Mobile sidebar toggle and backdrop handling
     const toggleBtn = document.getElementById('sidebarToggleBtn');
     const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.add('show');
+      if (backdrop) backdrop.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.remove('show');
+      if (backdrop) backdrop.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
     if (toggleBtn && sidebar) {
-      toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sidebar.classList.contains('show')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
       });
+    }
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeSidebar);
     }
 
     // Auto-dismiss toasts after 5 seconds

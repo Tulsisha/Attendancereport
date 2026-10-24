@@ -74,28 +74,28 @@
 
           <!-- Dynamic Status Badge -->
           <div>
-            {% if today_eval.badge_class == "badge-green" %}
-              <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 rounded-pill">
+            {% if today_eval.status_color == "green" or today_eval.badge_class == "badge-present" or "Present" in today_eval.status %}
+              <span class="status-badge badge-present px-3 py-2 fs-6">
                 <i class="bi bi-check-circle-fill me-1"></i> {{ today_eval.status }}
               </span>
-            {% elif today_eval.badge_class == "badge-red" %}
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6 rounded-pill">
+            {% elif today_eval.status_color == "red" or today_eval.badge_class == "badge-late" or "Late" in today_eval.status %}
+              <span class="status-badge badge-late px-3 py-2 fs-6">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ today_eval.status }}
               </span>
-            {% elif today_eval.badge_class == "badge-teal" %}
-              <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2 fs-6 rounded-pill">
+            {% elif today_eval.status_color == "teal" or today_eval.badge_class == "badge-pending" or "Pending" in today_eval.status %}
+              <span class="status-badge badge-pending px-3 py-2 fs-6">
                 <i class="bi bi-hourglass-split me-1"></i> {{ today_eval.status }}
               </span>
-            {% elif today_eval.badge_class == "badge-purple" %}
-              <span class="badge bg-primary-subtle text-purple border border-purple-subtle px-3 py-2 fs-6 rounded-pill" style="color: #6b21a8; background-color: #f3e8ff;">
+            {% elif today_eval.status_color == "purple" or today_eval.badge_class == "badge-leave" or "Leave" in today_eval.status %}
+              <span class="status-badge badge-leave px-3 py-2 fs-6">
                 <i class="bi bi-airplane-fill me-1"></i> {{ today_eval.status }}
               </span>
-            {% elif today_eval.badge_class == "badge-blue" %}
-              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6 rounded-pill">
+            {% elif today_eval.status_color == "blue" or today_eval.badge_class == "badge-holiday" or "Holiday" in today_eval.status %}
+              <span class="status-badge badge-holiday px-3 py-2 fs-6">
                 <i class="bi bi-calendar-event me-1"></i> {{ today_eval.status }}
               </span>
             {% else %}
-              <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fs-6 rounded-pill">
+              <span class="status-badge badge-secondary px-3 py-2 fs-6">
                 <i class="bi bi-dash-circle me-1"></i> {{ today_eval.status }}
               </span>
             {% endif %}
@@ -254,7 +254,7 @@
 
   <!-- ROW 3: Recent Attendance History -->
   <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
       <div>
         <h5 class="fw-bold mb-0 text-dark">Recent Attendance Records</h5>
         <small class="text-muted">Last 7 punch activities logged in the system</small>
@@ -265,7 +265,7 @@
     </div>
 
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table table-hover align-middle mb-0 table-attendance">
         <thead class="table-light">
           <tr>
             <th class="ps-3">Date</th>
@@ -279,7 +279,7 @@
         </thead>
         <tbody>
           {% for rec in recent_records %}
-            <tr>
+            <tr class="{{ rec.row_css_class }}">
               <td class="ps-3 fw-semibold text-dark">
                 {{ rec.date|date:"D, d M Y" }}
               </td>
@@ -309,24 +309,32 @@
                 {% endif %}
               </td>
               <td>
-                {% if rec.status == "On Time" %}
-                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
-                    <i class="bi bi-check-circle me-1"></i> On Time
+                {% if "Present" in rec.status or rec.status == "On Time" %}
+                  <span class="status-badge badge-present">
+                    <i class="bi bi-check-circle-fill me-1"></i> On Time
                   </span>
-                {% elif rec.status == "Late" %}
-                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
-                    <i class="bi bi-exclamation-triangle me-1"></i> Late
+                {% elif "Late" in rec.status %}
+                  <span class="status-badge badge-late">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Late
                   </span>
-                {% elif rec.status == "Punch Out Pending" %}
-                  <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">
+                {% elif "Pending" in rec.status %}
+                  <span class="status-badge badge-pending">
                     <i class="bi bi-hourglass-split me-1"></i> In Progress
                   </span>
-                {% elif rec.status == "Approved Leave" %}
-                  <span class="badge rounded-pill px-2 py-1" style="background-color: #ede9fe; color: #7c3aed; border: 1px solid #c4b5fd;">
-                    <i class="bi bi-airplane me-1"></i> Leave
+                {% elif "Leave" in rec.status %}
+                  <span class="status-badge badge-leave">
+                    <i class="bi bi-airplane-fill me-1"></i> Leave
+                  </span>
+                {% elif "Holiday" in rec.status %}
+                  <span class="status-badge badge-holiday">
+                    <i class="bi bi-calendar-event me-1"></i> Holiday
+                  </span>
+                {% elif "Absent" in rec.status %}
+                  <span class="status-badge badge-absent">
+                    <i class="bi bi-x-circle-fill me-1"></i> Absent
                   </span>
                 {% else %}
-                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded-pill">
+                  <span class="status-badge badge-secondary">
                     {{ rec.status|default:"Recorded" }}
                   </span>
                 {% endif %}

@@ -1,6 +1,6 @@
 /* =========================================================
    ATTENDANCE MANAGEMENT SYSTEM - HRMS ENTERPRISE DESIGN
-   Color Palette & Typography
+   Color Palette, Typography & Component Styling
 ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -42,21 +42,71 @@
   --leave-border: #c4b5fd;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
+}
+
+/* =========================================================
+   1. GLOBAL FONT SIZE & TYPOGRAPHY HIERARCHY
+========================================================= */
+
+html {
+  font-size: 14px;
 }
 
 body {
   background-color: var(--bg-main);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--text-main);
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, .h1 { font-size: 1.75rem; font-weight: 700; line-height: 1.25; color: var(--primary-navy); }
+h2, .h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.25; color: var(--primary-navy); }
+h3, .h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; color: var(--primary-navy); }
+h4, .h4 { font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: var(--primary-navy); }
+h5, .h5 { font-size: 1.0rem; font-weight: 600; line-height: 1.35; color: var(--primary-navy); }
+h6, .h6 { font-size: 0.875rem; font-weight: 600; line-height: 1.4; color: var(--primary-navy); }
+
+/* Form Controls & Sizing */
+.form-control,
+.form-select {
+  font-size: 14px;
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+}
+
+/* Requirement 5: Leave Category Dropdown 15px Font Size */
+#leaveTypeSelect,
+.leave-type-select {
+  font-size: 15px !important;
+  font-weight: 500;
+  min-height: 46px;
+  color: var(--text-main);
+}
+
+#leaveTypeSelect option,
+.leave-type-select option {
+  font-size: 15px !important;
+  padding: 8px 12px;
 }
 
 /* =========================================================
-   SIDEBAR NAVIGATION
+   2. SIDEBAR NAVIGATION & BLOCK HEADER
 ========================================================= */
 
 .sidebar {
@@ -71,21 +121,44 @@ body {
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Requirement 2: Header container replaced flex with display: block */
 .sidebar .brand-header {
-  padding: 24px 20px;
+  padding: 24px 20px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: block !important;
+  text-align: left;
 }
 
 .sidebar .brand-header img {
   height: 38px;
   max-width: 140px;
   object-fit: contain;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sidebar .brand-header .brand-text-block {
+  display: block;
+}
+
+.sidebar .brand-header .brand-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 2px;
+  letter-spacing: -0.2px;
+}
+
+.sidebar .brand-header .brand-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .sidebar .nav-list {
@@ -126,6 +199,7 @@ body {
   font-size: 18px;
   width: 22px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .sidebar .nav-link:hover {
@@ -147,8 +221,28 @@ body {
   background-color: rgba(0, 0, 0, 0.15);
 }
 
+/* Mobile Sidebar Backdrop Overlay */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.show {
+  display: block;
+  opacity: 1;
+}
+
 /* =========================================================
-   TOP NAVBAR
+   3. TOPBAR NAVBAR & RESPONSIVENESS
 ========================================================= */
 
 .topbar {
@@ -159,42 +253,66 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   position: sticky;
   top: 0;
   z-index: 1000;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  flex-wrap: wrap;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.topbar .page-title {
+  min-width: 0;
 }
 
 .topbar .page-title h4 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--primary-navy);
+  line-height: 1.25;
 }
 
 .topbar .page-title p {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
-.topbar .topbar-actions {
+.topbar .page-title p:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.topbar-actions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .clock-pill {
   background-color: #f1f5f9;
   border: 1px solid #e2e8f0;
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 30px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--primary-navy);
+  white-space: nowrap;
 }
 
 .clock-pill .live-indicator {
@@ -207,24 +325,25 @@ body {
 }
 
 /* =========================================================
-   MAIN CONTENT AREA
+   4. MAIN CONTENT AREA
 ========================================================= */
 
 .main-content {
   margin-left: 260px;
   padding: 28px 32px 60px;
   min-height: calc(100vh - 70px);
+  width: calc(100% - 260px);
 }
 
 /* =========================================================
-   HRMS STATISTIC CARDS
+   5. HRMS STATISTIC & METRIC CARDS
 ========================================================= */
 
 .stat-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 20px 22px;
+  padding: 18px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
@@ -237,223 +356,30 @@ body {
 }
 
 .stat-card .stat-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .stat-card .stat-value {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--primary-navy);
-  margin: 10px 0 2px;
+  margin: 8px 0 2px;
 }
 
 .stat-card .stat-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
 }
 
 /* =========================================================
-   SHIFT SCHEDULE BANNER
-========================================================= */
-
-.shift-banner {
-  background: linear-gradient(135deg, #072147 0%, #1e3a8a 100%);
-  color: #ffffff;
-  border-radius: 16px;
-  padding: 22px 28px;
-  box-shadow: 0 4px 15px rgba(7, 33, 71, 0.15);
-  margin-bottom: 24px;
-}
-
-.shift-badge {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(4px);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* =========================================================
-   FACE SCANNER COMPONENT (AI CAMERA PREVIEW)
-========================================================= */
-
-.scanner-card {
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  padding: 28px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-}
-
-.camera-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #0f172a;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  aspect-ratio: 4 / 3;
-}
-
-.camera-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1); /* mirror preview */
-}
-
-.camera-wrapper canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(-1);
-  pointer-events: none;
-}
-
-/* Scanning Reticle & Radar Animation */
-.scanner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.scanner-frame {
-  width: 240px;
-  height: 290px;
-  border: 2px dashed rgba(59, 130, 246, 0.7);
-  border-radius: 50% 50% 45% 45%;
-  position: relative;
-  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.45);
-}
-
-.scanner-frame::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
-  box-shadow: 0 0 15px #38bdf8;
-  animation: scanSweep 2s ease-in-out infinite;
-}
-
-@keyframes scanSweep {
-  0% { top: 5%; opacity: 0.3; }
-  50% { top: 90%; opacity: 1; }
-  100% { top: 5%; opacity: 0.3; }
-}
-
-.scanner-status-box {
-  margin-top: 18px;
-  text-align: center;
-}
-
-.scanner-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.scanner-badge.badge-info {
-  background-color: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-}
-
-.scanner-badge.badge-warning {
-  background-color: #fefce8;
-  color: #854d0e;
-  border: 1px solid #fef08a;
-}
-
-.scanner-badge.badge-success {
-  background-color: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-.scanner-badge.badge-danger {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-/* =========================================================
-   PUNCH BUTTONS
-========================================================= */
-
-.btn-punch-in {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-  border: none;
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  transition: all 0.2s ease;
-}
-
-.btn-punch-in:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-  color: #ffffff;
-}
-
-.btn-punch-out {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: #ffffff;
-  border: none;
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-  transition: all 0.2s ease;
-}
-
-.btn-punch-out:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  color: #ffffff;
-}
-
-/* =========================================================
-   ATTENDANCE TABLE & AUTOMATIC ROW COLOURS
+   6. ATTENDANCE TABLE & AUTOMATIC ROW COLOUR RULES
 ========================================================= */
 
 .attendance-table-card {
@@ -462,6 +388,10 @@ body {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-attendance {
@@ -478,122 +408,177 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 14px 18px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
 
 .table-attendance td {
-  padding: 14px 18px;
-  font-size: 14px;
+  padding: 12px 16px;
+  font-size: 13.5px;
   vertical-align: middle;
   border-bottom: 1px solid #f1f5f9;
 }
 
-/* MANDATORY ATTENDANCE ROW COLOUR RULES */
+/* MANDATORY ATTENDANCE MATRIX ROW COLOUR RULES (WITH ACCENT BORDER) */
 
 /* Green – Present / On Time (9:30 AM – 9:35 AM) */
 tr.row-present,
-.row-present > td {
+tr.row-present > td,
+tr.row-green,
+tr.row-green > td {
   background-color: var(--present-bg) !important;
-  color: #065f46;
+  color: #065f46 !important;
+}
+
+tr.row-present > td:first-child,
+tr.row-green > td:first-child {
+  border-left: 4px solid var(--present-green) !important;
 }
 
 /* Red – Late (After 9:35 AM) */
 tr.row-late,
-.row-late > td {
+tr.row-late > td,
+tr.row-red,
+tr.row-red > td {
   background-color: var(--late-bg) !important;
-  color: #991b1b;
+  color: #991b1b !important;
 }
 
-/* Yellow – Absent (Closed working day without valid punch) */
+tr.row-late > td:first-child,
+tr.row-red > td:first-child {
+  border-left: 4px solid var(--late-red) !important;
+}
+
+/* Yellow – Absent (Closed scheduled day without valid punch) */
 tr.row-absent,
-.row-absent > td {
+tr.row-absent > td,
+tr.row-yellow,
+tr.row-yellow > td {
   background-color: var(--absent-bg) !important;
-  color: #854d0e;
+  color: #854d0e !important;
+}
+
+tr.row-absent > td:first-child,
+tr.row-yellow > td:first-child {
+  border-left: 4px solid var(--absent-yellow) !important;
 }
 
 /* Teal – Punch Out Pending (Punched in, awaiting punch out) */
 tr.row-pending,
-.row-pending > td {
+tr.row-pending > td,
+tr.row-teal,
+tr.row-teal > td {
   background-color: var(--pending-bg) !important;
-  color: #115e59;
+  color: #115e59 !important;
+}
+
+tr.row-pending > td:first-child,
+tr.row-teal > td:first-child {
+  border-left: 4px solid var(--pending-teal) !important;
 }
 
 /* Blue – Holiday (Sunday or Configured Company Holiday) */
 tr.row-holiday,
-.row-holiday > td {
+tr.row-holiday > td,
+tr.row-blue,
+tr.row-blue > td {
   background-color: var(--holiday-bg) !important;
-  color: #1e40af;
+  color: #1e40af !important;
+}
+
+tr.row-holiday > td:first-child,
+tr.row-blue > td:first-child {
+  border-left: 4px solid var(--holiday-blue) !important;
 }
 
 /* Purple – Approved Leave */
 tr.row-leave,
-.row-leave > td {
+tr.row-leave > td,
+tr.row-purple,
+tr.row-purple > td {
   background-color: var(--leave-bg) !important;
-  color: #5b21b6;
+  color: #5b21b6 !important;
 }
 
-/* Row Hover */
+tr.row-leave > td:first-child,
+tr.row-purple > td:first-child {
+  border-left: 4px solid var(--leave-purple) !important;
+}
+
+/* Row Hover effect */
 .table-attendance tbody tr:hover td {
-  filter: brightness(0.96);
+  filter: brightness(0.97);
   transition: filter 0.15s ease;
 }
 
 /* =========================================================
-   STATUS BADGES
+   7. STATUS BADGES
 ========================================================= */
 
 .status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
   text-transform: capitalize;
   white-space: nowrap;
+  line-height: 1.25;
 }
 
-.badge-present {
-  background-color: #bbf7d0;
+.status-badge.badge-present,
+.status-badge.badge-green {
+  background-color: #dcfce7;
   color: #14532d;
   border: 1px solid var(--present-border);
 }
 
-.badge-late {
-  background-color: #fecaca;
+.status-badge.badge-late,
+.status-badge.badge-red {
+  background-color: #fee2e2;
   color: #7f1d1d;
   border: 1px solid var(--late-border);
 }
 
-.badge-absent {
-  background-color: #fde047;
+.status-badge.badge-absent,
+.status-badge.badge-yellow {
+  background-color: #fef9c3;
   color: #713f12;
   border: 1px solid var(--absent-border);
 }
 
-.badge-pending {
-  background-color: #99f6e4;
+.status-badge.badge-pending,
+.status-badge.badge-teal {
+  background-color: #ccfbf1;
   color: #134e4a;
   border: 1px solid var(--pending-border);
 }
 
-.badge-holiday {
-  background-color: #bfdbfe;
+.status-badge.badge-holiday,
+.status-badge.badge-blue {
+  background-color: #dbeafe;
   color: #1e3a8a;
   border: 1px solid var(--holiday-border);
 }
 
-.badge-leave {
-  background-color: #ddd6fe;
+.status-badge.badge-leave,
+.status-badge.badge-purple {
+  background-color: #ede9fe;
   color: #4c1d95;
   border: 1px solid var(--leave-border);
 }
 
+.status-badge.badge-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
 /* =========================================================
-   COLOR LEGEND
+   8. COLOR LEGEND
 ========================================================= */
 
 .attendance-legend {
@@ -602,11 +587,11 @@ tr.row-leave,
   align-items: center;
   gap: 14px;
   padding: 12px 18px;
-  background-color: #f8fafc;
+  background-color: #ffffff;
   border-radius: 12px;
   border: 1px solid var(--border-color);
   font-size: 13px;
-  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .legend-item {
@@ -616,14 +601,15 @@ tr.row-leave,
 }
 
 .legend-swatch {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 /* =========================================================
-   PRINT STYLES FOR ATTENDANCE SHEETS
+   9. PRINT STYLES
 ========================================================= */
 
 @media print {
@@ -633,6 +619,7 @@ tr.row-leave,
   .card-header .btn,
   .attendance-legend,
   .pagination,
+  .sidebar-backdrop,
   form {
     display: none !important;
   }
@@ -640,6 +627,7 @@ tr.row-leave,
   .main-content {
     margin-left: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
   }
 
   body {
@@ -666,7 +654,7 @@ tr.row-leave,
 }
 
 /* =========================================================
-   RESPONSIVE DESIGN (MOBILE & TABLET)
+   10. MOBILE & TABLET RESPONSIVENESS (320px - 1024px+)
 ========================================================= */
 
 @media (max-width: 992px) {
@@ -680,7 +668,91 @@ tr.row-leave,
 
   .topbar,
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .topbar {
+    padding: 12px 20px;
+  }
+
+  .main-content {
+    padding: 20px 20px 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .topbar-left {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .shift-pill {
+    display: none !important;
+  }
+
+  .main-content {
+    padding: 16px 16px 40px;
+  }
+
+  .table-attendance {
+    min-width: 650px;
+  }
+
+  .attendance-legend {
+    gap: 10px;
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+
+  .legend-item {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  html {
+    font-size: 13.5px;
+  }
+
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .main-content {
+    padding: 14px 12px 40px;
+  }
+
+  .page-title h4 {
+    font-size: 16px;
+  }
+
+  .clock-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .btn-punch-action {
+    font-size: 14px;
+    height: 48px;
+  }
+
+  .user-name-text {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
