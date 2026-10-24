@@ -156,10 +156,7 @@
         <input type="hidden" name="login_role" id="loginRoleInput" value="{{ role_hint|default:'employee' }}">
 
         <!-- Role Banner Inside Form -->
-        <div class="alert alert-light border py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2" id="roleInfoBanner">
-          <i class="bi bi-info-circle text-primary" id="roleInfoIcon"></i>
-          <span id="roleInfoText">Signing in as <strong>Employee</strong> to access personal dashboard & attendance.</span>
-        </div>
+
 
         <div class="form-floating mb-3">
           <input type="text" name="username" class="form-control rounded-3" id="loginUsername" placeholder="Username" required autofocus>
@@ -171,17 +168,7 @@
           <label for="loginPassword"><i class="bi bi-lock me-1"></i> Password</label>
         </div>
 
-        <div class="p-2 mb-3 bg-light border rounded-3 text-center small" id="credentialsHintBox">
-          <span class="text-muted d-block mb-1" style="font-size: 11px;">QUICK LOGIN CREDENTIALS:</span>
-          <div class="d-flex justify-content-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill" style="font-size: 12px;" onclick="autoFill('admin', 'admin123', 'admin')">
-              <i class="bi bi-shield-lock me-1"></i> Admin: admin
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 12px;" onclick="autoFill('Tulsi', 'tulsi123', 'employee')">
-              <i class="bi bi-person me-1"></i> Employee: Tulsi
-            </button>
-          </div>
-        </div>
+
 
         <button type="submit" class="btn btn-login w-100 mb-3" id="submitBtn">
           <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Employee Portal
