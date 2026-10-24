@@ -1,0 +1,36 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables & secrets
+.env
+*.env
+.venv/
+venv/
+ENV/
+env/
+
+# Static files collected during build
+staticfiles/
+
+# Media uploads
+media/leave_docs/*
+media/profiles/*
+!media/profiles/image.webp
+
+# SQLite journal
+*.sqlite3-journal
+
+# Operating system & IDE files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log

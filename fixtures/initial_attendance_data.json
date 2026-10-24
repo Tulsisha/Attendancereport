@@ -1,0 +1,842 @@
+[
+{
+  "model": "app.department",
+  "pk": 1,
+  "fields": {
+    "name": "Engineering",
+    "description": "",
+    "created_at": "2026-09-28T08:26:28.468Z"
+  }
+},
+{
+  "model": "app.department",
+  "pk": 2,
+  "fields": {
+    "name": "Human Resources",
+    "description": "",
+    "created_at": "2026-09-28T08:26:28.489Z"
+  }
+},
+{
+  "model": "app.department",
+  "pk": 3,
+  "fields": {
+    "name": "Sales & Marketing",
+    "description": "",
+    "created_at": "2026-09-28T08:26:28.497Z"
+  }
+},
+{
+  "model": "app.department",
+  "pk": 4,
+  "fields": {
+    "name": "Operations",
+    "description": "",
+    "created_at": "2026-09-28T08:26:28.507Z"
+  }
+},
+{
+  "model": "app.department",
+  "pk": 5,
+  "fields": {
+    "name": "Finance",
+    "description": "",
+    "created_at": "2026-09-28T08:28:44.369Z"
+  }
+},
+{
+  "model": "app.department",
+  "pk": 6,
+  "fields": {
+    "name": "IT & Development",
+    "description": "",
+    "created_at": "2026-09-28T09:49:18.986Z"
+  }
+},
+{
+  "model": "app.holiday",
+  "pk": 1,
+  "fields": {
+    "name": "New Year's Day",
+    "date": "2026-01-01",
+    "description": "Global New Year celebration"
+  }
+},
+{
+  "model": "app.holiday",
+  "pk": 2,
+  "fields": {
+    "name": "Republic Day",
+    "date": "2026-01-26",
+    "description": "National Republic Day"
+  }
+},
+{
+  "model": "app.holiday",
+  "pk": 3,
+  "fields": {
+    "name": "Independence Day",
+    "date": "2026-08-15",
+    "description": "National Independence Day"
+  }
+},
+{
+  "model": "app.holiday",
+  "pk": 4,
+  "fields": {
+    "name": "Gandhi Jayanti",
+    "date": "2026-10-02",
+    "description": "Mahatma Gandhi Birthday"
+  }
+},
+{
+  "model": "app.holiday",
+  "pk": 5,
+  "fields": {
+    "name": "Christmas Day",
+    "date": "2026-12-25",
+    "description": "Christmas holiday"
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$AXrkPaGN7VFYlUdTxsUNXg$dh6LwzfN8qJC5R5ffbDHoyQoBdfeWm7cEtS9gUaCqKc=",
+    "last_login": "2026-09-28T08:27:28.046Z",
+    "is_superuser": false,
+    "username": "tshah",
+    "first_name": "",
+    "last_name": "",
+    "email": "ts@gamil.com",
+    "is_staff": false,
+    "is_active": false,
+    "date_joined": "2025-11-08T11:11:24.773Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$PJoM08D8vuOxQOD5DA5cKN$O9b+8z286KLHmDWoBhuZeIWMxQtAXFO2iXtTfwXnJxI=",
+    "last_login": "2026-09-28T10:22:10.443Z",
+    "is_superuser": false,
+    "username": "Tulsi",
+    "first_name": "Tulsi",
+    "last_name": "Kumari",
+    "email": "Tulsishah668@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-12T07:55:51.833Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$c0ryGKWSVPWz31xSwGUO2v$WEVuujZHrRDZCTOnrW/RNLT652uX5XcaVzEsMpzPI64=",
+    "last_login": "2026-08-22T16:20:16.340Z",
+    "is_superuser": false,
+    "username": "Varun",
+    "first_name": "",
+    "last_name": "",
+    "email": "tulsi15002@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-22T15:40:35.714Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$FSs0nIJsWHAFhhJM2BJ8qv$wXlLMy32uR3rZPY3I1aKBxz+6Y4Cnn+j5vtd11/3MsQ=",
+    "last_login": "2026-08-22T16:37:20.745Z",
+    "is_superuser": false,
+    "username": "TulsiShah",
+    "first_name": "",
+    "last_name": "",
+    "email": "tulsi15002@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-22T16:22:25.341Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$zYy1SvkYktm2K8IdYZKQ3z$8WtRT24cg03oU97BqB6ytm/+u1aZYeAi7P1AbtlwHeI=",
+    "last_login": "2026-08-22T16:41:30.129Z",
+    "is_superuser": false,
+    "username": "Demo",
+    "first_name": "",
+    "last_name": "",
+    "email": "tulsi15002@gmail.com",
+    "is_staff": false,
+    "is_active": false,
+    "date_joined": "2026-08-22T16:41:18.317Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$RPnl8vYlanTIRKGATq5aRb$kKsE2cLHKSxCpen68rdye8dBzYmK5bo8gDTjfY8PGFY=",
+    "last_login": "2026-09-28T10:23:37.017Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "Admin",
+    "last_name": "Manager",
+    "email": "admin@company.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-09-28T09:49:18.999Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$VRDdStfI9AxdPuT3ddxHmA$ubF9onFzcWACmZKEFVvtAjDjytKSOoYvUq+dwb7yDos=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "employee",
+    "first_name": "Rahul",
+    "last_name": "Sharma",
+    "email": "rahul.sharma@company.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-28T09:49:19.711Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "2yc7dhlg1221mnqzxp0lie8tjodvi0s0",
+  "fields": {
+    "session_data": ".eJxVjMsOgjAQAP9lz6ahD7eFo3e-geyyrUVNm1A4Gf_dkHDQ68xk3jDRvuVpb3GdFoEBerj8Mqb5Gcsh5EHlXtVcy7YurI5EnbapsUp83c72b5CpZRjAJ2RvmTvy3AsaFiciwXoij-y0GOaAlByZIAG1XNFa0old6BxZC58vChg4XA:1xB6hs:AvkeaACikgBYaWP8jn6tmfDvWvrysPcGg4NgRfPbj-8",
+    "expire_date": "2026-10-12T08:27:28.221Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "5zaonq79jl1pr92wzz6qu1er0rb0xnas",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGlm7XstxKOk5g7X-4QCypTipIu5OIqWA9s3M24TjdSlu7Wl2UxRXMYjL7-Y5vFI9QHxyfTQZWl3myctDkSft8t5iet9O9--gcC97DaPxGizDwCYikspMrK0C0hEiQkZERZCNQtLGBmt27oFAjzmQQfH5Aq-4NlA:1vJWBr:450B4fDKtXaQ0g27LNYFyox7IGsQTH2qF1jsgFHw0q0",
+    "expire_date": "2025-11-27T12:12:39.706Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "686nnbmibr0tgrljttmfszfb6umoec07",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQAP_C2RCBlgWP3n0DYXdBqgaS0p6MfzckPeh1ZjJvEeK-lbD3tIaFxUUoLU6_ECM9Ux2GH7Hem6RWt3VBORJ52C5vjdPrerR_gxJ7GV_jyenZU9Y0Ac7WaX22GRgIMLk0Zau8sh4QIhhiYxiUQmCHyTh24vMF8kE3xw:1wxomg:usJl3QtpStobSh7BrQsF3ZoyIWXkyg3inH6v8f8IAE0",
+    "expire_date": "2026-09-05T16:41:30.153Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "acta867w5kz2ya1edt7vnee83mjt5cyo",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQAP_C2ZAt3WLx6N03kIVdpGogKe3J-HdD0oNeZybzVp72Lfu9yeoXVhdl1OmXBYpPKV3wg8q96ljLti5B90QftulbZXldj_ZvkKnlvrWCDBETEzgTcB5AhHEgHq1NxBIcT44Yx0QRZA5AE54TRwLjkkvq8wULQzlH:1wMlxU:4l7dmNuKOSBkPoU0LNa2Is7DGKjnk-qi2aaDbkNFwj8",
+    "expire_date": "2026-05-26T12:11:32.274Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "busj44fd7gf2vgts5y9n0rqc76ht982m",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQAP9lz4bwKkiP3vsNZJcFqRqalPZk_HfTpAe9zkzmDRH3rca95zXODCNouPwywvTM7RD8wHZfRFrats4kjkSctotp4fy6ne3foGKvMEJJ1mk3OO0tZmeSlwZVCsoREuurkSwzSy42F0y-8EAhkDSSFSkMiuHzBel_OHg:1vKd0R:_GCCJH1IGkp9jwqpGy0FY4ghKbSePmoSA-YdV4PsiIY",
+    "expire_date": "2025-11-30T13:41:27.710Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "glp2a3xx4jdzxkw7dmkk3d2lv07avm5a",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQAP9lz4bwKkiP3vsNZJcFqRqalPZk_HfTpAe9zkzmDRH3rca95zXODCNouPwywvTM7RD8wHZfRFrats4kjkSctotp4fy6ne3foGKvMEJJ1mk3OO0tZmeSlwZVCsoREuurkSwzSy42F0y-8EAhkDSSFSkMiuHzBel_OHg:1vKdWB:0qsb5zOb3ZzMvbRkWNNiZz2a9gJEWWVMGZejXRPZeyc",
+    "expire_date": "2025-11-30T14:14:15.512Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "kf7va1m29ixu4bua6x2yyudxtkjrgz5r",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAQRe_StWmGloGpS_eeoZl2poIaSCisjHdXEha6_e-9_zKRt3WIW9UljmLOhszpd0ucHzrtQO483Wab52ldxmR3xR602uss-rwc7t_BwHX41iVD8NSRSvLISiDoA_QZFVoRdejAOaVSAoc2kDSKXQJs0APnnoJ5fwDmUjeJ:1va9VK:WbJzPYW9ADlthogrFWfj-5UG2KGxjySeQXo0LszE3hA",
+    "expire_date": "2026-01-12T09:25:30.739Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ooxumskcrzwu6o3zk9atvni6bm2gz29v",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAQRe_StWmGloGpS_eeoZl2poIaSCisjHdXEha6_e-9_zKRt3WIW9UljmLOhszpd0ucHzrtQO483Wab52ldxmR3xR602uss-rwc7t_BwHX41iVD8NSRSvLISiDoA_QZFVoRdejAOaVSAoc2kDSKXQJs0APnnoJ5fwDmUjeJ:1vaZDW:2h4vyBoQxpJLmtEEhXSFLPJp4il_00bp1iy6ww-euOg",
+    "expire_date": "2026-01-13T12:52:50.545Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t0ie2uuyimuyaipxouuo9amxyah1s2fx",
+  "fields": {
+    "session_data": ".eJxVjEEOgjAQRe_StWmGloGpS_eeoZl2poIaSCisjHdXEha6_e-9_zKRt3WIW9UljmLOhszpd0ucHzrtQO483Wab52ldxmR3xR602uss-rwc7t_BwHX41iVD8NSRSvLISiDoA_QZFVoRdejAOaVSAoc2kDSKXQJs0APnnoJ5fwDmUjeJ:1va9Vo:eYCt29FTIxeqMcsxj8_NwVbJ81YA6qCSM7a8OXaOT6w",
+    "expire_date": "2026-01-12T09:26:00.961Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "ycx7rl0i9urua36u433ryv8yvgpplcuw",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hCgFMSle89AZphBqgaS0q6Md7dNutDte-__t4iwLiWunec4kbgII06_DCE9ue6CHlDvTaZWl3lCuSfysF3eGvHrerR_BwV62dY5WWfc6Iy3wG5IXg2gU9AOAcmcB0WKSVG2nCH5TCOGgGrDGjUETeLzBel_OHg:1veYOL:5KkHBP5RzcldnKq_sUeyiZLh8hzhqLQjG7TAML1K0FE",
+    "expire_date": "2026-01-24T12:48:29.750Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "zh2xv2byzxm14r42s84zwkx3rbw8lbk4",
+  "fields": {
+    "session_data": ".eJxVjEsOgjAUAO_y1qYpFFoeS_eeoXk_BDWQUFgZ725IWOh2ZjJvyLRvY96LrXlS6KGByy9jkqfNh9AHzffFyTJv68TuSNxpi7staq_r2f4NRioj9NAOgkKMhh1S5IC1aJUiRi_kkw91R8QhRRXPg1XBhi5FqzW1VWgaRvh8AffMOBI:1vHjmd:NkKqLvqFzNcjxsWGATnRpOSuTBDRvVZuBpgoDUMwQK0",
+    "expire_date": "2025-11-22T14:19:15.458Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "zvmx0jqdwlndd1gr48b2vfr550phgfaz",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hCgFMSle89AZphBqgaS0q6Md7dNutDte-__t4iwLiWunec4kbgII06_DCE9ue6CHlDvTaZWl3lCuSfysF3eGvHrerR_BwV62dY5WWfc6Iy3wG5IXg2gU9AOAcmcB0WKSVG2nCH5TCOGgGrDGjUETeLzBel_OHg:1vINRW:X7JmAYA74GHfXTNQARM4JrKFbdQF-Zh-oiyr2H2G5nY",
+    "expire_date": "2025-11-24T08:40:06.576Z"
+  }
+},
+{
+  "model": "app.leaverequest",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "leave_type": "Sick Leave",
+    "from_date": "2026-09-28",
+    "to_date": "2026-09-29",
+    "total_days": 2,
+    "reason": "for high fever",
+    "supporting_document": "",
+    "status": "Approved",
+    "is_cancelled": false,
+    "reviewed_by": [
+      "Tulsi"
+    ],
+    "reviewed_at": "2026-09-28T09:40:41.594Z",
+    "admin_remark": "",
+    "created_at": "2026-09-28T09:36:13.809Z"
+  }
+},
+{
+  "model": "app.leaverequest",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "leave_type": "Casual Leave",
+    "from_date": "2026-09-30",
+    "to_date": "2026-10-02",
+    "total_days": 3,
+    "reason": "For personal reason",
+    "supporting_document": "",
+    "status": "Rejected",
+    "is_cancelled": false,
+    "reviewed_by": [
+      "admin"
+    ],
+    "reviewed_at": "2026-09-28T10:13:43.996Z",
+    "admin_remark": "",
+    "created_at": "2026-09-28T09:52:29.129Z"
+  }
+},
+{
+  "model": "app.leaverequest",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "leave_type": "Unpaid Leave",
+    "from_date": "2026-10-08",
+    "to_date": "2026-10-15",
+    "total_days": 8,
+    "reason": "hgbfvdcx",
+    "supporting_document": "",
+    "status": "Approved",
+    "is_cancelled": false,
+    "reviewed_by": [
+      "admin"
+    ],
+    "reviewed_at": "2026-09-28T10:24:06.353Z",
+    "admin_remark": "",
+    "created_at": "2026-09-28T10:23:05.508Z"
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "tshah"
+    ],
+    "date": "2025-11-16",
+    "punch_in": "14:09:36.151",
+    "punch_out": "14:09:45.196",
+    "punch_in_latitude": null,
+    "punch_in_longitude": null,
+    "punch_in_location": null,
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "face_biometric",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": null,
+    "is_late": true,
+    "late_minutes": 280,
+    "working_hours": 0.0,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "tshah"
+    ],
+    "date": "2025-12-29",
+    "punch_in": "07:39:26.312",
+    "punch_out": null,
+    "punch_in_latitude": null,
+    "punch_in_longitude": null,
+    "punch_in_location": null,
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "face_biometric",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": null,
+    "is_late": false,
+    "late_minutes": 0,
+    "working_hours": 0.0,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Varun"
+    ],
+    "date": "2026-08-22",
+    "punch_in": "16:03:26.838",
+    "punch_out": "16:19:41.090",
+    "punch_in_latitude": "28.3512862",
+    "punch_in_longitude": "77.2804348",
+    "punch_in_location": null,
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "face_biometric",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": null,
+    "is_late": true,
+    "late_minutes": 393,
+    "working_hours": 0.27,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "TulsiShah"
+    ],
+    "date": "2026-08-22",
+    "punch_in": "16:22:51.618",
+    "punch_out": "16:37:24.603",
+    "punch_in_latitude": "28.3515360",
+    "punch_in_longitude": "77.2804950",
+    "punch_in_location": null,
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "face_biometric",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": null,
+    "is_late": true,
+    "late_minutes": 413,
+    "working_hours": 0.24,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "Demo"
+    ],
+    "date": "2026-08-22",
+    "punch_in": "22:11:40.653",
+    "punch_out": null,
+    "punch_in_latitude": "28.3514653",
+    "punch_in_longitude": "77.2806415",
+    "punch_in_location": "बल्लभगढ़, Haryana",
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "face_biometric",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": null,
+    "is_late": true,
+    "late_minutes": 762,
+    "working_hours": 0.0,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "date": "2026-09-28",
+    "punch_in": "15:20:45.056",
+    "punch_out": null,
+    "punch_in_latitude": "28.3518163",
+    "punch_in_longitude": "77.2801492",
+    "punch_in_location": "Location unavailable",
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "gps_location",
+    "face_verified_in": true,
+    "face_verified_out": false,
+    "confidence_score": 0.95,
+    "is_late": true,
+    "late_minutes": 351,
+    "working_hours": 0.0,
+    "notes": ""
+  }
+},
+{
+  "model": "app.dailyattendance",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "date": "2026-09-28",
+    "punch_in": "15:45:54.774",
+    "punch_out": null,
+    "punch_in_latitude": "28.3518620",
+    "punch_in_longitude": "77.2801843",
+    "punch_in_location": "Faridabad, Haryana, India",
+    "punch_out_latitude": null,
+    "punch_out_longitude": null,
+    "punch_out_location": null,
+    "verification_method": "gps_location",
+    "face_verified_in": false,
+    "face_verified_out": false,
+    "confidence_score": 1.0,
+    "is_late": true,
+    "late_minutes": 376,
+    "working_hours": 0.0,
+    "notes": ""
+  }
+},
+{
+  "model": "app.faceverificationlog",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "timestamp": "2026-09-28T09:50:45.061Z",
+    "action": "Punch (punch_in)",
+    "status": "Verified (Location)",
+    "confidence_distance": null,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "message": "Attendance punch recorded via live location: Location unavailable (IP: 127.0.0.1)."
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "tshah"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T08:19:12.674Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T08:19:12.725Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Varun"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T08:19:12.768Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "TulsiShah"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T08:19:12.804Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "Demo"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T08:19:12.847Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T09:49:19.023Z"
+  }
+},
+{
+  "model": "app.employeefaceprofile",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "employee"
+    ],
+    "face_descriptor": null,
+    "enrollment_status": "NOT_REGISTERED",
+    "is_enrolled": false,
+    "sample_count": 0,
+    "enrolled_at": null,
+    "enrolled_by": null,
+    "anti_spoofing_passed": false,
+    "liveness_score": 0.0,
+    "updated_at": "2026-09-28T09:49:19.716Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "tshah"
+    ],
+    "employee_id": "EMP0002",
+    "department": 1,
+    "designation": "Employee",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T08:19:12.657Z",
+    "updated_at": "2026-09-28T08:28:44.384Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Tulsi"
+    ],
+    "employee_id": "EMP0009",
+    "department": 1,
+    "designation": "Employee",
+    "phone": "9315933247",
+    "profile_picture": "profiles/image.webp",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T08:19:12.688Z",
+    "updated_at": "2026-09-28T10:12:24.268Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Varun"
+    ],
+    "employee_id": "EMP0010",
+    "department": 1,
+    "designation": "Employee",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T08:19:12.740Z",
+    "updated_at": "2026-09-28T08:28:44.410Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "TulsiShah"
+    ],
+    "employee_id": "EMP0011",
+    "department": 1,
+    "designation": "Employee",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T08:19:12.782Z",
+    "updated_at": "2026-09-28T08:28:44.424Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "Demo"
+    ],
+    "employee_id": "EMP0012",
+    "department": 1,
+    "designation": "Employee",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T08:19:12.818Z",
+    "updated_at": "2026-09-28T08:28:44.437Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "admin"
+    ],
+    "employee_id": "ADM0001",
+    "department": 6,
+    "designation": "HR & System Administrator",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T09:49:19.021Z",
+    "updated_at": "2026-09-28T09:49:19.702Z"
+  }
+},
+{
+  "model": "app.userprofile",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "employee"
+    ],
+    "employee_id": "EMP0101",
+    "department": 6,
+    "designation": "Software Engineer",
+    "phone": "",
+    "profile_picture": "",
+    "joining_date": "2026-09-28",
+    "face_auth_exempt": false,
+    "exemption_reason": "",
+    "created_at": "2026-09-28T09:49:19.714Z",
+    "updated_at": "2026-09-28T09:49:20.355Z"
+  }
+}
+]
